@@ -27,12 +27,13 @@ public enum Finger
 public class GestureController : MonoBehaviour
 {
 
-    private Gestures gestureFinger1 = Gestures.None;
-    private Gestures gestureFinger2 = Gestures.None;
+    public Gestures gestureFinger1 = Gestures.None;
+    public Gestures gestureFinger2 = Gestures.None;
     public Gestures lastGesture = Gestures.None;
     public Gestures currentGesture = Gestures.None;
     public float minimalSwipeDistanceY = 0.10f;
     public float minimalSwipeDistanceX = 0.10f;
+    public bool twoFingerTouch = true;
 
     public Vector2 startPosition;
     public Vector2 startPosition2;
@@ -63,7 +64,7 @@ public class GestureController : MonoBehaviour
         {
             GetOneFingerGesture();
         }
-        else if (Input.touchCount == 2 || multitouch)
+        else if (Input.touchCount == 2 || multitouch && twoFingerTouch)
         {
             GetTwoFingerGesture();
         }
@@ -113,41 +114,52 @@ public class GestureController : MonoBehaviour
             }
             CheckMultiFingerGesture();
         }
-
+        else if (gestureFinger1 == Gestures.None && gestureFinger2 != Gestures.None)
+        {
+            gestureFinger1 = SetTouchGesture(touch1, Finger.One);
+            CheckMultiFingerGesture();
+        }
+        else if (gestureFinger1 != Gestures.None && gestureFinger2 == Gestures.None)
+        {
+            gestureFinger2 = SetTouchGesture(touch1, Finger.Two);
+            CheckMultiFingerGesture();
+        }
+        else
+        {
+            Debug.Log("Multi touch triggered without multiple inputs");
+            //indien nog een beetje glitchy plaats ResetTwoFingerGesture
+        }
     }
 
     public void CheckMultiFingerGesture()
     {
-        if(gestureFinger1 != Gestures.None && gestureFinger2 != Gestures.None)
+        if (gestureFinger1 != Gestures.None && gestureFinger2 != Gestures.None)
         {
-            if(gestureFinger1 == Gestures.Touch || gestureFinger2 == Gestures.Touch)
+            if (gestureFinger1 == Gestures.Touch || gestureFinger2 == Gestures.Touch)
             {
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerTouch;
             }
-            if(((gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft 
-                || gestureFinger1 == Gestures.SwipeUpperLeft || gestureFinger1 == Gestures.SwipeUp) && 
-                (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight || 
-                gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown)) || 
-                (gestureFinger1 == Gestures.SwipeRight || gestureFinger1 == Gestures.SwipeDownRight ||
-                gestureFinger1 == Gestures.SwipeUpperRight || gestureFinger1 == Gestures.SwipeDown) &&
-                (gestureFinger2 == Gestures.SwipeLeft || gestureFinger2 == Gestures.SwipeDownLeft
-                || gestureFinger2 == Gestures.SwipeUpperLeft || gestureFinger2 == Gestures.SwipeUp)) 
+            else if (((gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft
+               || gestureFinger1 == Gestures.SwipeUpperLeft || gestureFinger1 == Gestures.SwipeUp) &&
+               (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight ||
+               gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown)) ||
+               (gestureFinger1 == Gestures.SwipeRight || gestureFinger1 == Gestures.SwipeDownRight ||
+               gestureFinger1 == Gestures.SwipeUpperRight || gestureFinger1 == Gestures.SwipeDown) &&
+               (gestureFinger2 == Gestures.SwipeLeft || gestureFinger2 == Gestures.SwipeDownLeft
+               || gestureFinger2 == Gestures.SwipeUpperLeft || gestureFinger2 == Gestures.SwipeUp))
             {
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerSwipeOutwards;
             }
-            if (((gestureFinger2 == Gestures.SwipeLeft || gestureFinger2 == Gestures.SwipeDownLeft
-                || gestureFinger2 == Gestures.SwipeUpperLeft || gestureFinger2 == Gestures.SwipeUp) &&
-                (gestureFinger1 == Gestures.SwipeRight || gestureFinger1 == Gestures.SwipeDownRight ||
-                gestureFinger1 == Gestures.SwipeUpperRight || gestureFinger1 == Gestures.SwipeDown)) ||
-                (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight ||
-                gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown) &&
-                (gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft
-                || gestureFinger1 == Gestures.SwipeUpperLeft || gestureFinger1 == Gestures.SwipeUp))
+            else if (gestureFinger2 == Gestures.SwipeLeft && gestureFinger1 == Gestures.SwipeRight)
             {
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerSwipeInwards;
+            }
+            else
+            {
+                ResetTwoFingerGestures();
             }
         }
     }
