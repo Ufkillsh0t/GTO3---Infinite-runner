@@ -125,14 +125,26 @@ public class GestureController : MonoBehaviour
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerTouch;
             }
-            if((gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft 
+            if(((gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft 
                 || gestureFinger1 == Gestures.SwipeUpperLeft || gestureFinger1 == Gestures.SwipeUp) && 
-                (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight || gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown))
+                (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight || 
+                gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown)) || 
+                (gestureFinger1 == Gestures.SwipeRight || gestureFinger1 == Gestures.SwipeDownRight ||
+                gestureFinger1 == Gestures.SwipeUpperRight || gestureFinger1 == Gestures.SwipeDown) &&
+                (gestureFinger2 == Gestures.SwipeLeft || gestureFinger2 == Gestures.SwipeDownLeft
+                || gestureFinger2 == Gestures.SwipeUpperLeft || gestureFinger2 == Gestures.SwipeUp)) 
             {
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerSwipeOutwards;
             }
-            if (gestureFinger1 == Gestures.SwipeRight && gestureFinger2 == Gestures.SwipeLeft)
+            if (((gestureFinger2 == Gestures.SwipeLeft || gestureFinger2 == Gestures.SwipeDownLeft
+                || gestureFinger2 == Gestures.SwipeUpperLeft || gestureFinger2 == Gestures.SwipeUp) &&
+                (gestureFinger1 == Gestures.SwipeRight || gestureFinger1 == Gestures.SwipeDownRight ||
+                gestureFinger1 == Gestures.SwipeUpperRight || gestureFinger1 == Gestures.SwipeDown)) ||
+                (gestureFinger2 == Gestures.SwipeRight || gestureFinger2 == Gestures.SwipeDownRight ||
+                gestureFinger2 == Gestures.SwipeUpperRight || gestureFinger2 == Gestures.SwipeDown) &&
+                (gestureFinger1 == Gestures.SwipeLeft || gestureFinger1 == Gestures.SwipeDownLeft
+                || gestureFinger1 == Gestures.SwipeUpperLeft || gestureFinger1 == Gestures.SwipeUp))
             {
                 ResetTwoFingerGestures();
                 currentGesture = Gestures.TwoFingerSwipeInwards;
