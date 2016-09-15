@@ -6,25 +6,38 @@ public class PlayerScript : MonoBehaviour
 {
     public bool stream_mobile_debug = true;
     public bool moveAccelerometer = false;
+    public bool moveSlideDistance = true;
+
     public float xSpeed = 10f;
     public float zSpeed = 10f;
     public float mobileSpeedMultiplier = 0.25f;
-    public float swipeSpeed = 1.5f;
 
-    public float jumpSpeed = 10f;
+    public bool grounded = false;
+
+    public float jumpSpeed = 200f;
+    public float gravity = 9.81f;
     public float deathPosY = -6f;
+
+    private Rigidbody rigidBody;
 
     private GestureController controller;
 
     void Awake()
     {
         controller = gameObject.GetComponent<GestureController>();
+        rigidBody = gameObject.GetComponent<Rigidbody>();
     }
 
     // Use this for initialization
     void Start()
     {
+        Physics.gravity = new Vector3(0, -gravity, 0);
         Screen.orientation = ScreenOrientation.LandscapeLeft;
+    }
+
+    void OnCollisionEnter(Collision col)
+    {
+        grounded = true;
     }
 
     // Update is called once per frame
@@ -39,12 +52,10 @@ public class PlayerScript : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Space))
             {
-                transform.Translate(xSpeed * horizontal * Time.deltaTime, jumpSpeed * Time.deltaTime, zSpeed * vertical * Time.deltaTime);
+                if (grounded) Jump();
+                //transform.Translate(xSpeed * horizontal * Time.deltaTime, jumpSpeed * Time.deltaTime, zSpeed * vertical * Time.deltaTime);
             }
-            else
-            {
-                transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
-            }
+            transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
         }
         else if (SystemInfo.deviceType != DeviceType.Console || stream_mobile_debug)
         {
@@ -94,54 +105,74 @@ public class PlayerScript : MonoBehaviour
     {
         if (controller != null)
         {
-            if (controller.currentGesture != Gestures.None)
-            {
-                switch (controller.currentGesture)
-                {
-                    case Gestures.Touch:
-                        UseItem();
-                        break;
-                    case Gestures.SwipeDown:
-                        Slide();
-                        break;
-                    case Gestures.SwipeDownLeft:
-                        Slide();
-                        MoveLeft();
-                        break;
-                    case Gestures.SwipeDownRight:
-                        Slide();
-                        MoveRight();
-                        break;
-                    case Gestures.SwipeLeft:
-                        MoveLeft();
-                        break;
-                    case Gestures.SwipeRight:
-                        MoveRight();
-                        break;
-                    case Gestures.SwipeUp:
-                        Jump();
-                        break;
-                    case Gestures.SwipeUpperLeft:
-                        Jump();
-                        MoveLeft();
-                        break;
-                    case Gestures.SwipeUpperRight:
-                        Jump();
-                        MoveRight();
-                        break;
-                    case Gestures.TwoFingerSwipeOutwards:
-                        Debug.Log("Outwards swipe");
-                        break;
-                    case Gestures.TwoFingerTouch:
-                        Debug.Log("Two finger touch");
-                        break;
-                }
-            }
+            GestureStates();
+            GestureMoves();
             Move();
         }
         else
         {
             Debug.LogError("Gesture controller not found");
+        }
+    }
+
+    private void GestureMoves()
+    {
+        if (controller.currentGesture != Gestures.None)
+        {
+            switch (controller.currentGesture)
+            {
+                case Gestures.Touch:
+                    UseItem();
+                    break;
+                case Gestures.SwipeDown:
+                    Slide();
+                    break;
+                case Gestures.SwipeDownLeft:
+                    Slide();
+                    MoveLeft();
+                    break;
+                case Gestures.SwipeDownRight:
+                    Slide();
+                    MoveRight();
+                    break;
+                case Gestures.SwipeUp:
+                    Jump();
+                    break;
+                case Gestures.TwoFingerSwipeOutwards:
+                    Debug.Log("Outwards swipe");
+                    break;
+                case Gestures.TwoFingerTouch:
+                    Debug.Log("Two finger touch");
+                    break;
+            }
+        }
+    }
+
+    private void GestureStates()
+    {
+        if (controller.currentState != Gestures.None)
+        {
+            switch (controller.currentState)
+            {
+                case Gestures.SwipeDownLeft:
+                    MoveLeft();
+                    break;
+                case Gestures.SwipeDownRight:
+                    MoveRight();
+                    break;
+                case Gestures.SwipeLeft:
+                    MoveLeft();
+                    break;
+                case Gestures.SwipeRight:
+                    MoveRight();
+                    break;
+                case Gestures.SwipeUpperLeft:
+                    MoveLeft();
+                    break;
+                case Gestures.SwipeUpperRight:
+                    MoveRight();
+                    break;
+            }
         }
     }
 
@@ -152,7 +183,8 @@ public class PlayerScript : MonoBehaviour
 
     private void Jump()
     {
-        transform.Translate(0, jumpSpeed, 0);
+        rigidBody.AddForce(Vector3.up * jumpSpeed);
+        grounded = false;
         Debug.Log("Jump");
     }
 
@@ -163,18 +195,32 @@ public class PlayerScript : MonoBehaviour
 
     private void MoveLeft()
     {
-        transform.Translate(-swipeSpeed, 0f, 0f);
+        if (moveSlideDistance)
+        {
+            transform.Translate(-xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+        }
+        else
+        {
+            transform.Translate(-xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+        }
         Debug.Log("Moved to the left");
     }
 
     private void MoveRight()
     {
-        transform.Translate(swipeSpeed, 0f, 0f);
+        if (moveSlideDistance)
+        {
+            transform.Translate(xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+        }
+        else
+        {
+            transform.Translate(xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+        }
         Debug.Log("Moved to the right");
     }
 
     private void Move()
     {
-        transform.Translate(0f, 0f, xSpeed * Time.deltaTime);
+        transform.Translate(0f, 0f, zSpeed * Time.deltaTime);
     }
 }

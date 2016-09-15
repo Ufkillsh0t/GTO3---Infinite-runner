@@ -29,8 +29,17 @@ public class GestureController : MonoBehaviour
 
     public Gestures gestureFinger1 = Gestures.None;
     public Gestures gestureFinger2 = Gestures.None;
+    //LastGesture that has been used.
     public Gestures lastGesture = Gestures.None;
+    //CurrentGesture after completed.
     public Gestures currentGesture = Gestures.None;
+    //CurrentGesture in progress. (That hasn't been done yet)
+    public Gestures currentState = Gestures.None;
+
+    public float swipeDistanceCurrentStateDivider = 200f;
+    public float swipeDistanceCurrentStateX = 0f;
+    public float swipeDistanceCurrentStateY = 0f;
+
     public float minimalSwipeDistanceY = 0.10f;
     public float minimalSwipeDistanceX = 0.10f;
     public bool twoFingerTouch = true;
@@ -46,7 +55,6 @@ public class GestureController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (Input.touchCount > 0)
         {
             GetGesture();
@@ -55,6 +63,7 @@ public class GestureController : MonoBehaviour
         {
             if (currentGesture != Gestures.None) lastGesture = currentGesture;
             currentGesture = Gestures.None;
+            currentState = Gestures.None;
         }
     }
 
@@ -77,6 +86,9 @@ public class GestureController : MonoBehaviour
         {
             case TouchPhase.Began:
                 startPosition = touch.position;
+                break;
+            case TouchPhase.Moved: //This case needs to be tested
+                currentState = SetTouchGesture(touch, Finger.One);
                 break;
             case TouchPhase.Ended:
                 lastGesture = currentGesture;
@@ -197,6 +209,9 @@ public class GestureController : MonoBehaviour
             swipeValueX = touch.position.x - startPosition2.x;
             swipeDistanceX = (new Vector2(0, startPosition2.x) - new Vector2(0, touch.position.x)).magnitude;
         }
+
+        swipeDistanceCurrentStateX = swipeDistanceX / swipeDistanceCurrentStateDivider;
+        swipeDistanceCurrentStateY = swipeDistanceY / swipeDistanceCurrentStateDivider;
 
         Debug.Log("SwipeValueY:" + swipeValueY + " SwipeDistY:" + swipeDistanceY + " SwipevalueX:" + swipeValueX + " SwipeDistX:" + swipeDistanceX);
 
