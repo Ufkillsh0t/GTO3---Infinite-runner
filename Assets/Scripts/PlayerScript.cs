@@ -52,7 +52,7 @@ public class PlayerScript : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Space))
             {
-                if (grounded) Jump();
+                Jump();
                 //transform.Translate(xSpeed * horizontal * Time.deltaTime, jumpSpeed * Time.deltaTime, zSpeed * vertical * Time.deltaTime);
             }
             transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
@@ -183,9 +183,12 @@ public class PlayerScript : MonoBehaviour
 
     private void Jump()
     {
-        rigidBody.AddForce(Vector3.up * jumpSpeed);
-        grounded = false;
-        Debug.Log("Jump");
+        if (grounded)
+        {
+            rigidBody.AddForce(Vector3.up * jumpSpeed);
+            grounded = false;
+            Debug.Log("Jump");
+        }
     }
 
     private void Slide()
