@@ -49,6 +49,12 @@ public class GestureController : MonoBehaviour
     public Vector2 endPosition;
     public Vector2 endPosition2;
 
+    private float swipeValueY;
+    private float swipeDistanceY;
+
+    private float swipeValueX;
+    private float swipeDistanceX;
+
     private bool multitouch = false;
     //public Vector2 startPosition2;
 
@@ -86,6 +92,7 @@ public class GestureController : MonoBehaviour
         {
             case TouchPhase.Began:
                 startPosition = touch.position;
+                endPosition = touch.position;
                 break;
             case TouchPhase.Moved: //This case needs to be tested
                 currentState = SetTouchGesture(touch, Finger.One);
@@ -185,35 +192,36 @@ public class GestureController : MonoBehaviour
 
     public Gestures SetTouchGesture(Touch touch, Finger curFinger)
     {
-        float swipeValueY;
-        float swipeDistanceY;
-
-        float swipeValueX;
-        float swipeDistanceX;
-
         if (curFinger == Finger.One)
         {
-            endPosition = touch.position;
-            swipeValueY = touch.position.y - startPosition.y;
-            swipeDistanceY = (new Vector2(0, startPosition.y) - new Vector2(0, touch.position.y)).magnitude;
+            //if ((endPosition - touch.position).magnitude < 400)
+            //{
+                endPosition = touch.position;
+                swipeValueY = touch.position.y - startPosition.y;
+                swipeDistanceY = (new Vector2(0, startPosition.y) - new Vector2(0, touch.position.y)).magnitude;
 
-            swipeValueX = touch.position.x - startPosition.x;
-            swipeDistanceX = (new Vector2(0, startPosition.x) - new Vector2(0, touch.position.x)).magnitude;
+                swipeValueX = touch.position.x - startPosition.x;
+                swipeDistanceX = (new Vector2(0, startPosition.x) - new Vector2(0, touch.position.x)).magnitude;
+            //}
         }
         else
         {
-            endPosition2 = touch.position;
-            swipeValueY = touch.position.y - startPosition2.y;
-            swipeDistanceY = (new Vector2(0, startPosition2.y) - new Vector2(0, touch.position.y)).magnitude;
+            //if ((endPosition - touch.position).magnitude < 400)
+            //{
+                endPosition2 = touch.position;
+                swipeValueY = touch.position.y - startPosition2.y;
+                swipeDistanceY = (new Vector2(0, startPosition2.y) - new Vector2(0, touch.position.y)).magnitude;
 
-            swipeValueX = touch.position.x - startPosition2.x;
-            swipeDistanceX = (new Vector2(0, startPosition2.x) - new Vector2(0, touch.position.x)).magnitude;
+                swipeValueX = touch.position.x - startPosition2.x;
+                swipeDistanceX = (new Vector2(0, startPosition2.x) - new Vector2(0, touch.position.x)).magnitude;
+            //}
         }
 
         swipeDistanceCurrentStateX = swipeDistanceX / swipeDistanceCurrentStateDivider;
         swipeDistanceCurrentStateY = swipeDistanceY / swipeDistanceCurrentStateDivider;
 
-        Debug.Log("SwipeValueY:" + swipeValueY + " SwipeDistY:" + swipeDistanceY + " SwipevalueX:" + swipeValueX + " SwipeDistX:" + swipeDistanceX);
+        //Debug.Log(swipeDistanceCurrentStateX);
+        //Debug.Log("SwipeValueY:" + swipeValueY + " SwipeDistY:" + swipeDistanceY + " SwipevalueX:" + swipeValueX + " SwipeDistX:" + swipeDistanceX);
 
         if (swipeDistanceX > minimalSwipeDistanceX)
         {

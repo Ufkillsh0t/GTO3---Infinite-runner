@@ -11,10 +11,11 @@ public class PlayerScript : MonoBehaviour
     public float xSpeed = 10f;
     public float zSpeed = 10f;
     public float mobileSpeedMultiplier = 0.25f;
+    public float maxSwipeMultipler = 1.2f;
 
     public bool grounded = false;
 
-    public float jumpSpeed = 200f;
+    public float jumpSpeed = 300f;
     public float gravity = 9.81f;
     public float deathPosY = -6f;
 
@@ -26,6 +27,7 @@ public class PlayerScript : MonoBehaviour
     {
         controller = gameObject.GetComponent<GestureController>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
+        if (moveAccelerometer == true && moveSlideDistance == true) moveSlideDistance = false;
     }
 
     // Use this for initialization
@@ -86,9 +88,10 @@ public class PlayerScript : MonoBehaviour
         {
             if (controller.currentGesture == Gestures.Touch)
             {
-                transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime,
+                Jump();
+                /*transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime,
                                     jumpSpeed * Time.deltaTime,
-                                    -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);
+                                    -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);*/
             }
             else
             {
@@ -107,7 +110,7 @@ public class PlayerScript : MonoBehaviour
         {
             GestureStates();
             GestureMoves();
-            Move();
+            if(!moveAccelerometer) Move();
         }
         else
         {
@@ -123,20 +126,6 @@ public class PlayerScript : MonoBehaviour
             {
                 case Gestures.Touch:
                     UseItem();
-                    break;
-                case Gestures.SwipeDown:
-                    Slide();
-                    break;
-                case Gestures.SwipeDownLeft:
-                    Slide();
-                    MoveLeft();
-                    break;
-                case Gestures.SwipeDownRight:
-                    Slide();
-                    MoveRight();
-                    break;
-                case Gestures.SwipeUp:
-                    Jump();
                     break;
                 case Gestures.TwoFingerSwipeOutwards:
                     Debug.Log("Outwards swipe");
@@ -156,9 +145,11 @@ public class PlayerScript : MonoBehaviour
             {
                 case Gestures.SwipeDownLeft:
                     MoveLeft();
+                    Slide();
                     break;
                 case Gestures.SwipeDownRight:
                     MoveRight();
+                    Slide();
                     break;
                 case Gestures.SwipeLeft:
                     MoveLeft();
@@ -168,9 +159,17 @@ public class PlayerScript : MonoBehaviour
                     break;
                 case Gestures.SwipeUpperLeft:
                     MoveLeft();
+                    Jump();
                     break;
                 case Gestures.SwipeUpperRight:
                     MoveRight();
+                    Jump();
+                    break;
+                case Gestures.SwipeUp:
+                    Jump();
+                    break;
+                case Gestures.SwipeDown:
+                    Slide();
                     break;
             }
         }
@@ -200,7 +199,9 @@ public class PlayerScript : MonoBehaviour
     {
         if (moveSlideDistance)
         {
-            transform.Translate(-xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultipler ? controller.swipeDistanceCurrentStateX : maxSwipeMultipler;
+            transform.Translate(-xSpeed * swipeMultiplier * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+            Debug.Log("Multiplier " + swipeMultiplier);
         }
         else
         {
@@ -213,6 +214,8 @@ public class PlayerScript : MonoBehaviour
     {
         if (moveSlideDistance)
         {
+            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultipler ? controller.swipeDistanceCurrentStateX : maxSwipeMultipler;
+            Debug.Log("Multiplier " + swipeMultiplier);
             transform.Translate(xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
         }
         else
@@ -224,6 +227,6 @@ public class PlayerScript : MonoBehaviour
 
     private void Move()
     {
-        transform.Translate(0f, 0f, zSpeed * Time.deltaTime);
+        transform.Translate(0f, 0f, zSpeed * mobileSpeedMultiplier * Time.deltaTime);
     }
 }
