@@ -104,12 +104,12 @@ public class PlatformManager : MonoBehaviour
         {
             for (float z = 0; z < maxGridZ; z += coinGridSize.z)
             {
+                    Vector3 spawnpos = new Vector3(position.x + x, position.y + scale.y, position.z + z);
+                    SpawnCoin(spawnpos); /*
                 int range = Random.Range(0, chancePerGrid);
                 if (range == 1)
                 {
-                    Vector3 spawnpos = new Vector3(position.x + x, position.y + scale.y, position.z + z);
-                    SpawnCoin(spawnpos);
-                }
+                }*/
             }
         }
     }
@@ -117,7 +117,7 @@ public class PlatformManager : MonoBehaviour
     private void SpawnCoin(Vector3 position)
     {
         Transform coin = coinQueue.Dequeue();
-        Vector3 spawnPos = new Vector3(position.x + (coinGridSize.x / 2), position.y + coin.localScale.y, position.z + (coinGridSize.z / 2));
+        Vector3 spawnPos = new Vector3(position.x - (coinGridSize.x / 2), position.y + coin.localScale.y, position.z - (coinGridSize.z / 2));
         coin.position = spawnPos;
         coinQueue.Enqueue(coin);
     }
