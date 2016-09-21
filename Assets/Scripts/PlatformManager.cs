@@ -8,11 +8,14 @@ public enum Spawns
     Coin
 }
 
+public enum CoinSpawn
+{
+    Line,
+    Single
+}
+
 public class PlatformManager : MonoBehaviour
 {
-    
-
-
     private Vector3 platformNextPosition;
     public int numberOfPlatforms;
     private Queue<Transform> platformQueue;
@@ -26,11 +29,14 @@ public class PlatformManager : MonoBehaviour
     public int numberOfCoins;
     public Vector3 coinHidePosition;
     public Vector3 coinGridSize;
-    public int chancePerGrid;
     private Queue<Transform> coinQueue;
+    public CoinSpawn spawnType = CoinSpawn.Line;
 
+    public int noneChance = 30;
+    public int coinChance = 20;
     private GameObject player;
 
+    private int totalChance;
 
 
     // Use this for initialization
@@ -55,6 +61,8 @@ public class PlatformManager : MonoBehaviour
             Recycle();
         }
         player = GameObject.FindGameObjectWithTag("Player");
+
+        totalChance = noneChance + coinChance;
     }
 
     // Update is called once per frame
@@ -88,8 +96,8 @@ public class PlatformManager : MonoBehaviour
         platform.localPosition = position;
         platform.GetComponent<Renderer>().material.color = Color.HSVToRGB(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
         platformQueue.Enqueue(platform);
-        
-        SpawnCoinsPlatform(position, scale);
+
+        SpawnGridsPlatform(position, scale);
 
         platformNextPosition += new Vector3(
             Random.Range(platformMinGap.x, platformMaxGap.x) + scale.x,
@@ -106,31 +114,49 @@ public class PlatformManager : MonoBehaviour
         }
     }
 
-    private void SpawnCoinsPlatform(Vector3 position, Vector3 scale)
+    private void SpawnGridsPlatform(Vector3 position, Vector3 scale)
     {
         int gridsX = GetGridsX(scale);
         int gridsZ = GetGridsZ(scale);
-
-        position.x -= (scale.x / 2);
-        position.z -= (scale.z / 2);
-
-        Debug.DrawRay(position, Vector3.up, Color.red, 20f);
-
-        int[,] gridSpawnArray = new int[gridsX, gridsZ];
-
         float xSpawnGap = (scale.x - gridsX) / 2;
         float zSpawnGap = (scale.z - gridsZ) / 2;
 
+        //Zet de posities juist voor gridspawning.
+        position.x -= (scale.x / 2);
+        position.z -= (scale.z / 2);
         position.x += xSpawnGap;
         position.z += zSpawnGap;
+        position.y += scale.y;
 
-        Debug.Log(gridsX + ", " + gridsZ + "Gaps:" + xSpawnGap + ", " + zSpawnGap);
+        Spawns[,] gridSpawnArray = GetSpawns(gridsX, gridsZ);
+        SpawnPlatform(gridSpawnArray, position);
+    }
 
-        for(int x = 0; x < gridsX; x++)
+    private Spawns[,] GetSpawns(int gridsX, int gridsZ)
+    {
+        Spawns[,] gridSpawnArray = new Spawns[gridsX, gridsZ];
+        
+        for(int x = 0; x < gridSpawnArray.GetLength(0); x++)
         {
-            for(int z = 0; z < gridsZ; z++)
+            int spawn = Random.Range(0, totalChance);
+            for (int z = 0; z < gridSpawnArray.GetLength(1); z++)
             {
-                Vector3 spawnpos = new Vector3(position.x + x, position.y + scale.y, position.z + z);
+                //gridSpawnArray[x,z] = 
+            }
+        }
+
+        return gridSpawnArray;
+    }
+
+    //private Spawns Get
+
+    private void SpawnPlatform(Spawns[,] gridSpawnArray, Vector3 position)
+    {
+        for (int x = 0; x < gridSpawnArray.GetLength(0); x++)
+        {
+            for (int z = 0; z < gridSpawnArray.GetLength(1); z++)
+            {
+                Vector3 spawnpos = new Vector3(position.x + x, position.y, position.z + z);
                 SpawnCoin(spawnpos);
             }
         }
