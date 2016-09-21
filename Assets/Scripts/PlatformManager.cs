@@ -2,8 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum Spawns
+{
+    None,
+    Coin
+}
+
 public class PlatformManager : MonoBehaviour
 {
+    
+
 
     private Vector3 platformNextPosition;
     public int numberOfPlatforms;
@@ -66,12 +74,14 @@ public class PlatformManager : MonoBehaviour
             Random.Range(platformMinSize.z, platformMaxSize.z)
             );
 
+        /*
         int grids = GetGrids(scale);
-        Debug.Log(grids);
+        Debug.Log(grids);*/
 
         Vector3 position = platformNextPosition;
         position.x += scale.x * 0.5f;
         position.y += scale.y * 0.5f;
+        //position.z += scale.z * 0.5f;
 
         Transform platform = platformQueue.Dequeue();
         platform.localScale = scale;
@@ -98,43 +108,63 @@ public class PlatformManager : MonoBehaviour
 
     private void SpawnCoinsPlatform(Vector3 position, Vector3 scale)
     {
-        float maxGridX = scale.x - coinGridSize.x;
-        float maxGridZ = scale.z - coinGridSize.z;
-        for (float x = 0; x < maxGridX; x += coinGridSize.x)
+        int gridsX = GetGridsX(scale);
+        int gridsZ = GetGridsZ(scale);
+
+        position.x -= (scale.x / 2);
+        position.z -= (scale.z / 2);
+
+        Debug.DrawRay(position, Vector3.up, Color.red, 20f);
+
+        int[,] gridSpawnArray = new int[gridsX, gridsZ];
+
+        float xSpawnGap = (scale.x - gridsX) / 2;
+        float zSpawnGap = (scale.z - gridsZ) / 2;
+
+        position.x += xSpawnGap;
+        position.z += zSpawnGap;
+
+        Debug.Log(gridsX + ", " + gridsZ + "Gaps:" + xSpawnGap + ", " + zSpawnGap);
+
+        for(int x = 0; x < gridsX; x++)
         {
-            for (float z = 0; z < maxGridZ; z += coinGridSize.z)
+            for(int z = 0; z < gridsZ; z++)
             {
-                    Vector3 spawnpos = new Vector3(position.x + x, position.y + scale.y, position.z + z);
-                    SpawnCoin(spawnpos); /*
-                int range = Random.Range(0, chancePerGrid);
-                if (range == 1)
-                {
-                }*/
+                Vector3 spawnpos = new Vector3(position.x + x, position.y + scale.y, position.z + z);
+                SpawnCoin(spawnpos);
             }
         }
+    }
+
+    private int GetGridsX(Vector3 scale)
+    {
+        int grids = 0;
+        float xSize = scale.x;
+        while(xSize > coinGridSize.x)
+        {
+            xSize -= coinGridSize.x;
+            grids++;
+        }
+        return grids;
+    }
+
+    private int GetGridsZ(Vector3 scale)
+    {
+        int grids = 0;
+        float zSize = scale.z;
+        while (zSize > coinGridSize.z)
+        {
+            zSize -= coinGridSize.z;
+            grids++;
+        }
+        return grids;
     }
 
     private void SpawnCoin(Vector3 position)
     {
         Transform coin = coinQueue.Dequeue();
-        Vector3 spawnPos = new Vector3(position.x - (coinGridSize.x / 2), position.y + coin.localScale.y, position.z - (coinGridSize.z / 2));
+        Vector3 spawnPos = new Vector3(position.x + coin.localScale.x, position.y + coin.localScale.y, position.z + coin.localScale.z);
         coin.position = spawnPos;
         coinQueue.Enqueue(coin);
-    }
-
-    public int GetGrids(Vector3 scale)
-    {
-        int grids = 0;
-        float maxGridX = scale.x - coinGridSize.x;
-        float maxGridZ = scale.z - coinGridSize.z;
-        for (float x = 0; x < maxGridX; x += coinGridSize.x)
-        {
-            grids++;
-            for(float z = 0; z < maxGridZ; z += coinGridSize.z)
-            {
-                grids++;
-            }
-        }
-        return grids;
     }
 }
