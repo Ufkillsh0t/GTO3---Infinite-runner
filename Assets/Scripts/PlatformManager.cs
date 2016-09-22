@@ -30,7 +30,7 @@ public class PlatformManager : MonoBehaviour
     public Vector3 coinHidePosition;
     public Vector3 coinGridSize;
     private Queue<Transform> coinQueue;
-    public CoinSpawn spawnType = CoinSpawn.Line;
+    public CoinSpawn coinSpawnType = CoinSpawn.Line;
 
     public int noneChance = 30;
     public int coinChance = 20;
@@ -42,6 +42,7 @@ public class PlatformManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        totalChance = noneChance + coinChance;
         platformQueue = new Queue<Transform>(numberOfPlatforms);
         for (int i = 0; i < numberOfPlatforms; i++)
         {
@@ -62,7 +63,6 @@ public class PlatformManager : MonoBehaviour
         }
         player = GameObject.FindGameObjectWithTag("Player");
 
-        totalChance = noneChance + coinChance;
     }
 
     // Update is called once per frame
@@ -134,30 +134,57 @@ public class PlatformManager : MonoBehaviour
 
     private Spawns[,] GetSpawns(int gridsX, int gridsZ)
     {
-        Spawns[,] gridSpawnArray = new Spawns[gridsX, gridsZ];
-        
-        for(int x = 0; x < gridSpawnArray.GetLength(0); x++)
+        Spawns[,] gridSpawnArray = new Spawns[gridsZ, gridsX];
+
+        for (int z = 0; z < gridSpawnArray.GetLength(0); z++)
         {
-            int spawn = Random.Range(0, totalChance);
-            for (int z = 0; z < gridSpawnArray.GetLength(1); z++)
+            int chance = Random.Range(0, totalChance);
+            Spawns spawn = GetSpawnByChance(chance);
+
+            for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {
-                //gridSpawnArray[x,z] = 
+                if (coinSpawnType == CoinSpawn.Line && spawn == Spawns.Coin)
+                {
+                    gridSpawnArray[z, x] = spawn;
+                }
+                else if (coinSpawnType != CoinSpawn.Line && x > 0)
+                {
+                    chance = Random.Range(0, totalChance);
+                    spawn = GetSpawnByChance(chance);
+                    gridSpawnArray[z, x] = spawn;
+                }
             }
         }
 
         return gridSpawnArray;
     }
 
+    private Spawns GetSpawnByChance(int chance)
+    {
+        if (chance <= noneChance)
+        {
+            return Spawns.None;
+        }
+        if (chance <= (noneChance + coinChance))
+        {
+            return Spawns.Coin;
+        }
+        return Spawns.None;
+    }
+
     //private Spawns Get
 
     private void SpawnPlatform(Spawns[,] gridSpawnArray, Vector3 position)
     {
-        for (int x = 0; x < gridSpawnArray.GetLength(0); x++)
+        for (int z = 0; z < gridSpawnArray.GetLength(0); z++)
         {
-            for (int z = 0; z < gridSpawnArray.GetLength(1); z++)
+            for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {
                 Vector3 spawnpos = new Vector3(position.x + x, position.y, position.z + z);
-                SpawnCoin(spawnpos);
+                if (gridSpawnArray[z, x] == Spawns.Coin)
+                {
+                    SpawnCoin(spawnpos);
+                }
             }
         }
     }
@@ -166,7 +193,7 @@ public class PlatformManager : MonoBehaviour
     {
         int grids = 0;
         float xSize = scale.x;
-        while(xSize > coinGridSize.x)
+        while (xSize > coinGridSize.x)
         {
             xSize -= coinGridSize.x;
             grids++;
