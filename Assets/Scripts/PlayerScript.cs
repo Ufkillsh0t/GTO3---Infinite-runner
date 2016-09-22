@@ -19,7 +19,9 @@ public class PlayerScript : MonoBehaviour
     public float gravity = 9.81f;
     public float deathPosY = -6f;
 
-    private Rigidbody rigidBody;
+    public int collectedCoins = 0;
+
+    private Rigidbody rigidBody;    
 
     private GestureController controller;
 
