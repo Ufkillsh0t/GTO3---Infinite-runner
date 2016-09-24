@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public enum Spawns
 {
     None,
-    Coin
+    Coin,
+    Magnet
 }
 
 public enum CoinSpawn
@@ -17,7 +18,7 @@ public enum CoinSpawn
 public class PlatformManager : MonoBehaviour
 {
     private Vector3 platformNextPosition;
-    public int numberOfPlatforms;
+    public int numberOfPlatforms = 20;
     private Queue<Transform> platformQueue;
     public Transform platformPrefab;
     public float platformRecycleOffset;
@@ -26,14 +27,20 @@ public class PlatformManager : MonoBehaviour
     public float platformMinY, platformMaxY;
 
     public Transform coinPrefab;
-    public int numberOfCoins;
+    public int numberOfCoins = 75;
     public Vector3 coinHidePosition;
-    public Vector3 coinGridSize;
+    public Vector3 gridSize;
     private Queue<Transform> coinQueue;
     public CoinSpawn coinSpawnType = CoinSpawn.Line;
 
+    public Transform magnetPrefab;
+    public int numberOfMagnets = 4;
+    public Vector3 magnetHidePosition;
+    private Queue<Transform> magnetQueue;
+
     public int noneChance = 30;
     public int coinChance = 20;
+    public int magnetChance = 4;
     private GameObject player;
 
     private int totalChance;
@@ -42,27 +49,74 @@ public class PlatformManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        totalChance = noneChance + coinChance;
-        platformQueue = new Queue<Transform>(numberOfPlatforms);
-        for (int i = 0; i < numberOfPlatforms; i++)
-        {
-            platformQueue.Enqueue((Transform)Instantiate(platformPrefab));
-        }
+        totalChance = noneChance + coinChance + magnetChance;
 
-        coinQueue = new Queue<Transform>(numberOfCoins);
-        coinPrefab.position = coinHidePosition;
-        for (int i = 0; i < numberOfCoins; i++)
-        {
-            coinQueue.Enqueue((Transform)Instantiate(coinPrefab));
-        }
+        if (gridSize == null) gridSize = new Vector3(1, 1, 1);
 
-        platformNextPosition = platformStartPosition;
-        for (int i = 0; i < numberOfPlatforms; i++)
+        InstantiatePlatforms();
+        InstantiateCoins();
+        InstantiateMagnet();
+
+        if (platformPrefab != null)
         {
-            Recycle();
+            platformNextPosition = platformStartPosition;
+            for (int i = 0; i < numberOfPlatforms; i++)
+            {
+                Recycle();
+            }
         }
         player = GameObject.FindGameObjectWithTag("Player");
 
+    }
+
+    private void InstantiatePlatforms()
+    {
+        if (platformPrefab != null)
+        {
+            platformQueue = new Queue<Transform>(numberOfPlatforms);
+            for (int i = 0; i < numberOfPlatforms; i++)
+            {
+                platformQueue.Enqueue((Transform)Instantiate(platformPrefab));
+            }
+        }
+        else
+        {
+            Debug.LogError("Could not generate platforms due to missing prefab!");
+        }
+    }
+
+    private void InstantiateCoins()
+    {
+        if (coinPrefab != null)
+        {
+            coinQueue = new Queue<Transform>(numberOfCoins);
+            coinPrefab.position = coinHidePosition;
+            for (int i = 0; i < numberOfCoins; i++)
+            {
+                coinQueue.Enqueue((Transform)Instantiate(coinPrefab));
+            }
+        }
+        else
+        {
+            Debug.Log("Coin prefab couldn't be found!");
+        }
+    }
+
+    private void InstantiateMagnet()
+    {
+        if (magnetPrefab != null)
+        {
+            magnetQueue = new Queue<Transform>(numberOfMagnets);
+            magnetPrefab.position = magnetHidePosition;
+            for (int i = 0; i < numberOfMagnets; i++)
+            {
+                magnetQueue.Enqueue((Transform)Instantiate(magnetPrefab));
+            }
+        }
+        else
+        {
+            Debug.Log("Magnet prefab couldn't be found!");
+        }
     }
 
     // Update is called once per frame
@@ -140,6 +194,7 @@ public class PlatformManager : MonoBehaviour
         {
             int chance = Random.Range(0, totalChance);
             Spawns spawn = GetSpawnByChance(chance);
+            bool magnetSpawned = false;
 
             for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {
@@ -151,6 +206,10 @@ public class PlatformManager : MonoBehaviour
                 {
                     chance = Random.Range(0, totalChance);
                     spawn = GetSpawnByChance(chance);
+                    if (spawn == Spawns.Magnet && magnetSpawned)
+                    {
+                        spawn = Spawns.None;
+                    }
                     gridSpawnArray[z, x] = spawn;
                 }
             }
@@ -169,6 +228,10 @@ public class PlatformManager : MonoBehaviour
         {
             return Spawns.Coin;
         }
+        if (chance <= (noneChance + coinChance + magnetChance))
+        {
+            return Spawns.Magnet;
+        }
         return Spawns.None;
     }
 
@@ -182,9 +245,18 @@ public class PlatformManager : MonoBehaviour
             {
                 Vector3 spawnpos = new Vector3(position.x + x, position.y, position.z + z);
                 if (gridSpawnArray[z, x] == Spawns.Coin)
-                {
                     SpawnCoin(spawnpos);
-                }
+               /* if(gridSpawnArray[x,z] == Spawns.Magnet)
+                    SpawnMagnet(spawnpos);*/
+                /*switch (gridSpawnArray[x, z])
+                {
+                    case Spawns.Coin:
+                        SpawnCoin(spawnpos);
+                        break;
+                    case Spawns.Magnet:
+                        SpawnMagnet(spawnpos);
+                        break;
+                }*/
             }
         }
     }
@@ -193,9 +265,9 @@ public class PlatformManager : MonoBehaviour
     {
         int grids = 0;
         float xSize = scale.x;
-        while (xSize > coinGridSize.x)
+        while (xSize > gridSize.x)
         {
-            xSize -= coinGridSize.x;
+            xSize -= gridSize.x;
             grids++;
         }
         return grids;
@@ -205,9 +277,9 @@ public class PlatformManager : MonoBehaviour
     {
         int grids = 0;
         float zSize = scale.z;
-        while (zSize > coinGridSize.z)
+        while (zSize > gridSize.z)
         {
-            zSize -= coinGridSize.z;
+            zSize -= gridSize.z;
             grids++;
         }
         return grids;
@@ -219,5 +291,13 @@ public class PlatformManager : MonoBehaviour
         Vector3 spawnPos = new Vector3(position.x + coin.localScale.x, position.y + coin.localScale.y, position.z + coin.localScale.z);
         coin.position = spawnPos;
         coinQueue.Enqueue(coin);
+    }
+
+    private void SpawnMagnet(Vector3 position)
+    {
+        Transform magnet = magnetQueue.Dequeue();
+        Vector3 spawnPos = new Vector3(position.x + magnet.localScale.x, position.y + magnet.localScale.y, position.z + magnet.localScale.z);
+        magnet.position = spawnPos;
+        magnetQueue.Enqueue(magnet);
     }
 }
