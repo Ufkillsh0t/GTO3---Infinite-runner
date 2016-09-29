@@ -40,7 +40,7 @@ public class PlatformManager : MonoBehaviour
 
     public int noneChance = 30;
     public int coinChance = 20;
-    public int magnetChance = 4;
+    public int magnetChance = 100;
     private GameObject player;
 
     private int totalChance;
@@ -206,11 +206,30 @@ public class PlatformManager : MonoBehaviour
                 {
                     chance = Random.Range(0, totalChance);
                     spawn = GetSpawnByChance(chance);
-                    if (spawn == Spawns.Magnet && magnetSpawned)
+                    if (spawn == Spawns.Magnet)
+                    {
+                        if (magnetSpawned)
+                        {
+                            spawn = Spawns.None;
+                        }
+                        else
+                        {
+                            magnetSpawned = true;
+                        }
+                    }
+                    gridSpawnArray[z, x] = spawn;
+                }
+                else if (spawn == Spawns.Magnet)
+                {
+                    if (magnetSpawned)
                     {
                         spawn = Spawns.None;
                     }
-                    gridSpawnArray[z, x] = spawn;
+                    else
+                    {
+                        gridSpawnArray[z, x] = spawn;
+                        magnetSpawned = true;
+                    }
                 }
             }
         }
@@ -244,11 +263,7 @@ public class PlatformManager : MonoBehaviour
             for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {
                 Vector3 spawnpos = new Vector3(position.x + x, position.y, position.z + z);
-                if (gridSpawnArray[z, x] == Spawns.Coin)
-                    SpawnCoin(spawnpos);
-               /* if(gridSpawnArray[x,z] == Spawns.Magnet)
-                    SpawnMagnet(spawnpos);*/
-                /*switch (gridSpawnArray[x, z])
+                switch (gridSpawnArray[z, x])
                 {
                     case Spawns.Coin:
                         SpawnCoin(spawnpos);
@@ -256,7 +271,7 @@ public class PlatformManager : MonoBehaviour
                     case Spawns.Magnet:
                         SpawnMagnet(spawnpos);
                         break;
-                }*/
+                }
             }
         }
     }
@@ -296,7 +311,7 @@ public class PlatformManager : MonoBehaviour
     private void SpawnMagnet(Vector3 position)
     {
         Transform magnet = magnetQueue.Dequeue();
-        Vector3 spawnPos = new Vector3(position.x + magnet.localScale.x, position.y + magnet.localScale.y, position.z + magnet.localScale.z);
+        Vector3 spawnPos = new Vector3(position.x + magnet.localScale.x, position.y, position.z + magnet.localScale.z);
         magnet.position = spawnPos;
         magnetQueue.Enqueue(magnet);
     }
