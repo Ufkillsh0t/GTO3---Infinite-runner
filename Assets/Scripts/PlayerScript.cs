@@ -14,6 +14,7 @@ public class PlayerScript : MonoBehaviour
     public float maxSwipeMultipler = 1.2f;
 
     public bool grounded = false;
+    public bool magnetUsed = false;
 
     public float jumpSpeed = 300f;
     public float gravity = 9.81f;
@@ -21,14 +22,19 @@ public class PlayerScript : MonoBehaviour
 
     public int collectedCoins = 0;
 
-    private Rigidbody rigidBody;    
-
+    private float magnetDuration = 12f;
+    private Rigidbody rigidBody;
+    private BoxCollider box;
     private GestureController controller;
+
+    public BoxCollider BoxCollider { get { return box; } set { box = value; } }
+    public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
 
     void Awake()
     {
         controller = gameObject.GetComponent<GestureController>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
+        box = gameObject.GetComponent<BoxCollider>();
         if (moveAccelerometer == true && moveSlideDistance == true) moveSlideDistance = false;
     }
 
@@ -69,6 +75,24 @@ public class PlayerScript : MonoBehaviour
         if (transform.position.y < deathPosY)
         {
             SceneManager.LoadScene(0);
+        }
+
+        MagnetUsed();
+    }
+
+    private void MagnetUsed()
+    {
+        if (magnetUsed)
+        {
+            if(magnetDuration > 0f)
+            {
+                magnetDuration -= Time.deltaTime;
+            }
+            else
+            {
+                magnetUsed = false;
+                ColliderReset();
+            }
         }
     }
 
@@ -230,5 +254,10 @@ public class PlayerScript : MonoBehaviour
     private void Move()
     {
         transform.Translate(0f, 0f, zSpeed * mobileSpeedMultiplier * Time.deltaTime);
+    }
+    
+    private void ColliderReset()
+    {
+        box.size = new Vector3(1, 1, 1);
     }
 }
