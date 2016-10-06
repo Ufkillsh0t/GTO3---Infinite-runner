@@ -45,6 +45,7 @@ public class PlatformManager : MonoBehaviour
 
     private int totalChance;
 
+    //Misschien een integer maken met nexPlatformPowerup, waarin je de remaining platforms zet voor een powerup.
 
     // Use this for initialization
     void Start()
@@ -189,12 +190,12 @@ public class PlatformManager : MonoBehaviour
     private Spawns[,] GetSpawns(int gridsX, int gridsZ)
     {
         Spawns[,] gridSpawnArray = new Spawns[gridsZ, gridsX];
-
+        
+        bool magnetSpawned = false;
         for (int z = 0; z < gridSpawnArray.GetLength(0); z++)
         {
             int chance = Random.Range(0, totalChance);
             Spawns spawn = GetSpawnByChance(chance);
-            bool magnetSpawned = false;
 
             for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {

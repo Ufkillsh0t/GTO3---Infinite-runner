@@ -19,6 +19,8 @@ public class PlayerScript : MonoBehaviour
     public float jumpSpeed = 300f;
     public float gravity = 9.81f;
     public float deathPosY = -6f;
+    public float magnetRadius = 5f;
+
 
     public int collectedCoins = 0;
 
@@ -87,12 +89,23 @@ public class PlayerScript : MonoBehaviour
             if(magnetDuration > 0f)
             {
                 magnetDuration -= Time.deltaTime;
+                DetectCoins();
             }
             else
             {
                 magnetUsed = false;
-                ColliderReset();
+                //ColliderReset();
             }
+        }
+    }
+
+    private void DetectCoins()
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(new Ray(gameObject.transform.position, new Vector3(1, 0, 1)), magnetRadius);
+        foreach(RaycastHit hit in hits)
+        {
+            IResource r = hit.collider.gameObject.GetComponent<IResource>();
+            r.PickUp();
         }
     }
 

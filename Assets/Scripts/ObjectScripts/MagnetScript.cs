@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class MagnetScript : MonoBehaviour
+public class MagnetScript : MonoBehaviour, IResource
 {
 
     private static PlayerScript player;
     private Vector3 startPosition;
     private float coliderScale = 2f;
     private float duration = 12f;
+    public ResourceType resourceType = ResourceType.Magnet;
 
     void Awake()
     {
@@ -22,15 +24,22 @@ public class MagnetScript : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        PickUp();
+    }
+
+    public void PickUp()
+    {
         transform.position = startPosition;
         if (!player.magnetUsed)
         {
-            player.BoxCollider.size = new Vector3(player.BoxCollider.size.x * coliderScale, 
-                player.BoxCollider.size.y, 
-                player.BoxCollider.size.z * coliderScale);
             player.magnetUsed = true;
         }
-        player.MagnetDuration = duration; 
+        player.MagnetDuration = duration;
         Debug.Log("I got triggered!");
+    }
+
+    public ResourceType GetResourceType()
+    {
+        return resourceType;
     }
 }
