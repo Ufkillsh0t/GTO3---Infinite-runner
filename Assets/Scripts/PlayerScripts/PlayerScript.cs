@@ -77,7 +77,7 @@ public class PlayerScript : MonoBehaviour
 
         if (transform.position.y < deathPosY)
         {
-            SceneManager.LoadScene(0);
+            pss.PlayDeathSound();
         }
 
         MagnetUsed();

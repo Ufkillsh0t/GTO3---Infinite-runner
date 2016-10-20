@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.SceneManagement;
 
 public enum PickUpObject
 {
@@ -34,6 +34,8 @@ public class PlayerSoundScript : MonoBehaviour
     //Picking up coins
     public AudioSource playerPickup;
 
+    private bool triggeredDeath;
+
     // Use this for initialization
     void Start()
     {
@@ -47,7 +49,7 @@ public class PlayerSoundScript : MonoBehaviour
         {
             Debug.Log("Audiosource 0 missing no playermovement sound!");
         }
-        if (sources[0] != null)
+        if (sources[1] != null)
         {
             playerInteraction = sources[1];
             playerInteraction.loop = false;
@@ -56,7 +58,7 @@ public class PlayerSoundScript : MonoBehaviour
         {
             Debug.Log("Audiosource 1 missing no interaction sound!");
         }
-        if (sources[0] != null)
+        if (sources[2] != null)
         {
             playerPickup = sources[2];
             playerPickup.loop = false;
@@ -65,13 +67,15 @@ public class PlayerSoundScript : MonoBehaviour
         {
             Debug.Log("Audiosource 2 missing no pickup sound!");
         }
+
+        triggeredDeath = false;
     }
 
     public void PlayFootSteps()
     {
         if (playerMovement != null && footStepsSounds != null && footStepsSounds.Length > 0)
         {
-            playerMovement.clip = footStepsSounds[Random.Range(0, (footStepsSounds.Length - 1))];
+            playerMovement.clip = footStepsSounds[Random.Range(0, (deathSounds.Length))];
             playerMovement.Play();
         }
         else
@@ -84,7 +88,7 @@ public class PlayerSoundScript : MonoBehaviour
     {
         if (playerMovement != null && jumpSounds != null && jumpSounds.Length > 0)
         {
-            playerMovement.clip = jumpSounds[Random.Range(0, (footStepsSounds.Length - 1))];
+            playerMovement.clip = jumpSounds[Random.Range(0, (deathSounds.Length))];
             playerMovement.Play();
         }
         else
@@ -97,7 +101,7 @@ public class PlayerSoundScript : MonoBehaviour
     {
         if (playerInteraction != null && interactionSounds != null && interactionSounds.Length > 0)
         {
-            playerInteraction.clip = interactionSounds[Random.Range(0, (interactionSounds.Length - 1))];
+            playerInteraction.clip = interactionSounds[Random.Range(0, (deathSounds.Length))];
             playerInteraction.Play();
         }
         else
@@ -108,7 +112,7 @@ public class PlayerSoundScript : MonoBehaviour
 
     public void PlayPickup(PickUpObject po)
     {
-        if(playerPickup != null && pickupSounds != null && pickupSounds.Length > 0)
+        if (playerPickup != null && pickupSounds != null && pickupSounds.Length > 0)
         {
             switch (po)
             {
@@ -117,7 +121,7 @@ public class PlayerSoundScript : MonoBehaviour
                     break;
                 case PickUpObject.Magnet:
                     playerPickup.clip = pickupSounds[(int)PickUpObject.Magnet];
-                    break;             
+                    break;
             }
             playerPickup.Play();
         }
@@ -125,6 +129,32 @@ public class PlayerSoundScript : MonoBehaviour
         {
             Debug.Log("Triggered PlayPickup but no audioSource or pickup clips could be found");
         }
+    }
+
+    public void PlayDeathSound()
+    {
+        if (playerInteraction != null && deathSounds != null && deathSounds.Length > 0)
+        {
+            if (!triggeredDeath)
+            {
+                StartCoroutine(DelayedLoad());
+                triggeredDeath = true;
+            }
+        }
+        else
+        {
+            Debug.Log("Triggered PlayInteraction but no audioSource or interaction clips could be found");
+        }
+    }
+
+    IEnumerator DelayedLoad()
+    {
+        playerInteraction.clip = deathSounds[Random.Range(0, (deathSounds.Length))];
+        playerInteraction.Play();
+
+        yield return new WaitForSeconds(playerInteraction.clip.length);
+
+        SceneManager.LoadScene(0);
     }
 
 }
