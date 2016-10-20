@@ -6,6 +6,7 @@ public class CoinScript : MonoBehaviour {
     private static PlayerScript player;
     private Vector3 startPosition;
     public int coinValue = 1;
+    private PickUpObject po = PickUpObject.Coin;
 
     void Awake()
     {
@@ -22,6 +23,7 @@ public class CoinScript : MonoBehaviour {
     {
         transform.position = startPosition;
         player.collectedCoins++;
+        player.pss.PlayPickup(po);
         Debug.Log("I got triggered!");
     }
 }

@@ -51,7 +51,7 @@ public class PlatformManager : MonoBehaviour
     {
         totalChance = noneChance + coinChance + magnetChance;
 
-        if (gridSize == null) gridSize = new Vector3(1, 1, 1);
+        gridSize = new Vector3(1, 1, 1);
 
         InstantiatePlatforms();
         InstantiateCoins();

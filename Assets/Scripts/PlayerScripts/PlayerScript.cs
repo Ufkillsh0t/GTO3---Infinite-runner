@@ -27,6 +27,8 @@ public class PlayerScript : MonoBehaviour
     private BoxCollider box;
     private GestureController controller;
 
+    public PlayerSoundScript pss;
+
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
 
@@ -35,6 +37,7 @@ public class PlayerScript : MonoBehaviour
         controller = gameObject.GetComponent<GestureController>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
         box = gameObject.GetComponent<BoxCollider>();
+        pss = gameObject.GetComponent<PlayerSoundScript>();
         if (moveAccelerometer == true && moveSlideDistance == true) moveSlideDistance = false;
     }
 

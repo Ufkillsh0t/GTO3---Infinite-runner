@@ -8,10 +8,12 @@ public class MagnetScript : MonoBehaviour
     private Vector3 startPosition;
     private float coliderScale = 2f;
     private float duration = 12f;
+    private PickUpObject po = PickUpObject.Magnet;
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
+        startPosition = transform.position;
     }
 
     // Use this for initialization
@@ -30,7 +32,8 @@ public class MagnetScript : MonoBehaviour
                 player.BoxCollider.size.z * coliderScale);
             player.magnetUsed = true;
         }
-        player.MagnetDuration = duration; 
+        player.MagnetDuration = duration;
+        player.pss.PlayPickup(po);
         Debug.Log("I got triggered!");
     }
 }
