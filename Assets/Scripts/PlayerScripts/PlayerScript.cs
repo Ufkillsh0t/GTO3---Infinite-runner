@@ -20,6 +20,13 @@ public class PlayerScript : MonoBehaviour
     public float gravity = 9.81f;
     public float deathPosY = -6f;
 
+    [Range(100, 500)]
+    public float feetMin = 350f;
+    [Range(500, 600)]
+    public float feetMax = 450f;
+
+    private float feetTime = 0f;
+
     public int collectedCoins = 0;
 
     private float magnetDuration = 12f;
@@ -50,6 +57,7 @@ public class PlayerScript : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
+        pss.PlayLanding();
         grounded = true;
     }
 
@@ -80,14 +88,29 @@ public class PlayerScript : MonoBehaviour
             pss.PlayDeathSound();
         }
 
+        PlayFeet();
         MagnetUsed();
+    }
+
+    private void PlayFeet()
+    {
+        if (!pss.playerMovement.isPlaying && feetTime < 0)
+        {
+
+            feetTime = Random.Range(feetMin, feetMax);
+            pss.PlayFootSteps();
+        }
+        else
+        {
+            feetTime -= Time.deltaTime;
+        }
     }
 
     private void MagnetUsed()
     {
         if (magnetUsed)
         {
-            if(magnetDuration > 0f)
+            if (magnetDuration > 0f)
             {
                 magnetDuration -= Time.deltaTime;
             }
@@ -139,7 +162,7 @@ public class PlayerScript : MonoBehaviour
         {
             GestureStates();
             GestureMoves();
-            if(!moveAccelerometer) Move();
+            if (!moveAccelerometer) Move();
         }
         else
         {
@@ -215,6 +238,7 @@ public class PlayerScript : MonoBehaviour
         {
             rigidBody.AddForce(Vector3.up * jumpSpeed);
             grounded = false;
+            pss.PlayJump();
             Debug.Log("Jump");
         }
     }
@@ -258,7 +282,7 @@ public class PlayerScript : MonoBehaviour
     {
         transform.Translate(0f, 0f, zSpeed * mobileSpeedMultiplier * Time.deltaTime);
     }
-    
+
     private void ColliderReset()
     {
         box.size = new Vector3(1, 1, 1);

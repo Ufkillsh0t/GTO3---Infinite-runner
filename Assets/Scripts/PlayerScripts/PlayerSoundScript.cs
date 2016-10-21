@@ -16,8 +16,9 @@ public class PlayerSoundScript : MonoBehaviour
     public AudioClip[] footStepsSounds;
     //Jumping sounds
     public AudioClip[] jumpSounds;
-    //Sound when you almost fall of the edge.
-    public AudioClip[] nearEdgeSounds;
+    //Jump landing
+    public AudioClip[] jumpLandingSounds;
+
 
     //Talking, Couching, Puffing, Screaming and Cheering for example.
     public AudioClip[] interactionSounds;
@@ -75,8 +76,7 @@ public class PlayerSoundScript : MonoBehaviour
     {
         if (playerMovement != null && footStepsSounds != null && footStepsSounds.Length > 0)
         {
-            playerMovement.clip = footStepsSounds[Random.Range(0, (deathSounds.Length))];
-            playerMovement.Play();
+            playerMovement.PlayOneShot(footStepsSounds[Random.Range(0, (deathSounds.Length))]);
         }
         else
         {
@@ -88,8 +88,7 @@ public class PlayerSoundScript : MonoBehaviour
     {
         if (playerMovement != null && jumpSounds != null && jumpSounds.Length > 0)
         {
-            playerMovement.clip = jumpSounds[Random.Range(0, (deathSounds.Length))];
-            playerMovement.Play();
+            playerMovement.PlayOneShot(jumpSounds[Random.Range(0, (deathSounds.Length))]);
         }
         else
         {
@@ -101,8 +100,7 @@ public class PlayerSoundScript : MonoBehaviour
     {
         if (playerInteraction != null && interactionSounds != null && interactionSounds.Length > 0)
         {
-            playerInteraction.clip = interactionSounds[Random.Range(0, (deathSounds.Length))];
-            playerInteraction.Play();
+            playerInteraction.PlayOneShot(interactionSounds[Random.Range(0, (deathSounds.Length))]);
         }
         else
         {
@@ -117,13 +115,12 @@ public class PlayerSoundScript : MonoBehaviour
             switch (po)
             {
                 case PickUpObject.Coin:
-                    playerPickup.clip = pickupSounds[(int)PickUpObject.Coin];
+                    playerPickup.PlayOneShot(pickupSounds[(int)PickUpObject.Coin]);
                     break;
                 case PickUpObject.Magnet:
-                    playerPickup.clip = pickupSounds[(int)PickUpObject.Magnet];
+                    playerPickup.PlayOneShot(pickupSounds[(int)PickUpObject.Magnet]);
                     break;
             }
-            playerPickup.Play();
         }
         else
         {
@@ -144,6 +141,18 @@ public class PlayerSoundScript : MonoBehaviour
         else
         {
             Debug.Log("Triggered PlayInteraction but no audioSource or interaction clips could be found");
+        }
+    }
+
+    public void PlayLanding()
+    {
+        if (playerMovement != null && jumpLandingSounds != null && jumpLandingSounds.Length > 0)
+        {
+            playerMovement.PlayOneShot(jumpLandingSounds[Random.Range(0, (jumpLandingSounds.Length))]);
+        }
+        else
+        {
+            Debug.Log("Triggered PlayFootSteps but no audioSource or jump clips could be found");
         }
     }
 
