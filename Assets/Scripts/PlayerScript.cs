@@ -101,7 +101,7 @@ public class PlayerScript : MonoBehaviour
 
     private void DetectCoins()
     {
-        RaycastHit[] hits = Physics.SphereCastAll(new Ray(gameObject.transform.position, new Vector3(1, 0, 1)), magnetRadius);
+        RaycastHit[] hits = Physics.SphereCastAll(new Ray(gameObject.transform.position, new Vector3(magnetRadius, magnetRadius, magnetRadius)), magnetRadius);
         foreach(RaycastHit hit in hits)
         {
             IResource r = hit.collider.gameObject.GetComponent<IResource>();
