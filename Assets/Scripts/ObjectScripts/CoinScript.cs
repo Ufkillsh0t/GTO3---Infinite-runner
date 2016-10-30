@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class CoinScript : MonoBehaviour, System.IComparable<CoinScript>
+public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
 {
 
     private static PlayerScript player;
@@ -59,5 +59,10 @@ public class CoinScript : MonoBehaviour, System.IComparable<CoinScript>
     private float GetRange()
     {
         return Vector3.Distance(transform.position, player.transform.position);
+    }
+
+    public float GetValue()
+    {
+        return GetRange();
     }
 }

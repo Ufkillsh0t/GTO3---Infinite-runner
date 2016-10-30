@@ -21,6 +21,7 @@ internal class PriorityQueue<T> where T : IComparable<T>
     public PriorityQueue()
         : this(16)
     {
+        
     }
 
     public PriorityQueue(int capacity)
