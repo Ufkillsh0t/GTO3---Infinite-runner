@@ -14,7 +14,6 @@ public class PlayerScript : MonoBehaviour
     public float maxSwipeMultipler = 1.2f;
 
     public bool grounded = false;
-    public bool magnetUsed = false;
 
     public float jumpSpeed = 300f;
     public float gravity = 9.81f;
@@ -29,7 +28,11 @@ public class PlayerScript : MonoBehaviour
 
     public int collectedCoins = 0;
 
+    public bool magnetUsed = false;
+    public int magnetPickupRange = 5;
     private float magnetDuration = 12f;
+
+
     private Rigidbody rigidBody;
     private BoxCollider box;
     private GestureController controller;

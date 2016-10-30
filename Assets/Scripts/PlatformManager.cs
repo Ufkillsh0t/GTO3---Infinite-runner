@@ -30,7 +30,7 @@ public class PlatformManager : MonoBehaviour
     public int numberOfCoins = 75;
     public Vector3 coinHidePosition;
     public Vector3 gridSize;
-    private Queue<Transform> coinQueue;
+    private PriorityQueue<CoinScript> coinQueue;
     public CoinSpawn coinSpawnType = CoinSpawn.Line;
 
     public Transform magnetPrefab;
@@ -89,11 +89,11 @@ public class PlatformManager : MonoBehaviour
     {
         if (coinPrefab != null)
         {
-            coinQueue = new Queue<Transform>(numberOfCoins);
+            coinQueue = new PriorityQueue<CoinScript>(numberOfCoins);
             coinPrefab.position = coinHidePosition;
             for (int i = 0; i < numberOfCoins; i++)
             {
-                coinQueue.Enqueue((Transform)Instantiate(coinPrefab));
+                coinQueue.Enqueue(Instantiate(coinPrefab).GetComponent<CoinScript>());
             }
         }
         else
@@ -302,9 +302,12 @@ public class PlatformManager : MonoBehaviour
 
     private void SpawnCoin(Vector3 position)
     {
-        Transform coin = coinQueue.Dequeue();
-        Vector3 spawnPos = new Vector3(position.x + coin.localScale.x, position.y + coin.localScale.y, position.z + coin.localScale.z);
-        coin.position = spawnPos;
+        CoinScript coin = coinQueue.Dequeue();
+        Transform coinTransform = coin.transform;
+        Vector3 spawnPos = new Vector3(position.x + coinTransform.localScale.x, position.y + coinTransform.localScale.y, position.z + coinTransform.localScale.z);
+        coinTransform.position = spawnPos;
+        coin.pickedUp = false;
+        coin.enabled = true;
         coinQueue.Enqueue(coin);
     }
 
