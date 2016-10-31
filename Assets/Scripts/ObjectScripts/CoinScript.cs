@@ -30,9 +30,9 @@ public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
         transform.position = startPosition;
         player.collectedCoins++;
         pickedUp = true;
-        this.enabled = false;
+        //this.enabled = false;
         player.pss.PlayPickup(po);
-        Debug.Log("I got triggered!");
+        //Debug.Log("I got triggered!");
     }
 
     public int CompareTo(CoinScript other)

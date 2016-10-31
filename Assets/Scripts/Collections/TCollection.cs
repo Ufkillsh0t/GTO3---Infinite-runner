@@ -22,6 +22,9 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         items = new T[size];
     }
 
+    /// <summary>
+    /// The size of the collection.
+    /// </summary>
     public int Count
     {
         get
@@ -30,6 +33,10 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         }
     }
 
+    /// <summary>
+    /// Returns and removes the object with the highest value from the collection.
+    /// </summary>
+    /// <returns></returns>
     public T DequeueMax()
     {
         int maxIndex = MaxIndex();
@@ -39,6 +46,10 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         return max;
     }
 
+    /// <summary>
+    /// Returns and removes the object with the lowest value from the collection.
+    /// </summary>
+    /// <returns>The object with the lowest value</returns>
     public T DequeueMin()
     {
         int minIndex = MinIndex();
@@ -48,6 +59,10 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         return min;
     }
 
+    /// <summary>
+    /// Adds the given object to the collection.
+    /// </summary>
+    /// <param name="item">The item you want to add to the collection</param>
     public void Enqueue(T item)
     {
         if (itemCount >= size)
@@ -61,11 +76,19 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         itemCount++;
     }
 
+    /// <summary>
+    /// Returns the object with the highest value in the collection.
+    /// </summary>
+    /// <returns>The object with the highest value</returns>
     public T Max()
     {
         return items[MaxIndex()];
     }
 
+    /// <summary>
+    /// Returns the index of the item with the highest value.
+    /// </summary>
+    /// <returns>The index of the item with the highest value</returns>
     private int MaxIndex()
     {
         int highestIndex = 0;
@@ -76,11 +99,19 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         return highestIndex;
     }
 
+    /// <summary>
+    /// Retrieves the object with the lowest value in the collection.
+    /// </summary>
+    /// <returns>The object with the lowest value</returns>
     public T Min()
     {
         return items[MinIndex()];
     }
 
+    /// <summary>
+    /// Returns the index of the item with the lowest value
+    /// </summary>
+    /// <returns>The index of the item with the lowest value</returns>
     private int MinIndex()
     {
         int lowestIndex = 0;
@@ -91,6 +122,11 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         return lowestIndex;
     }
 
+    /// <summary>
+    /// Removes the given object from the collection.
+    /// </summary>
+    /// <param name="item">The item that needs to be removed from the collection</param>
+    /// <returns>Wether the object has been deleted or not</returns>
     public bool Remove(T item)
     {
         for (int i = 0; i < itemCount; i++)

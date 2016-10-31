@@ -36,6 +36,7 @@ public class PlayerScript : MonoBehaviour
     private Rigidbody rigidBody;
     private BoxCollider box;
     private GestureController controller;
+    private PlatformManager pm;
 
     public PlayerSoundScript pss;
 
