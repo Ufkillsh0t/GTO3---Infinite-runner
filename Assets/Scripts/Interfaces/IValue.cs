@@ -7,7 +7,7 @@ interface IValue
     /// Gets the float value of the object.
     /// </summary>
     /// <returns>The value of this object</returns>
-    float GetValue();
+    float Value { get; }
 
     /// <summary>
     /// Gets wether the object has been used or not.

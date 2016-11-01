@@ -59,7 +59,7 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         if (maxIndex < 0) return default(T);
 
         T max = items[maxIndex];
-        if (max.GetValue() >= value)
+        if (max.Value >= value)
         {
             items = ExtensionMethods.RemoveAt(items, maxIndex);
             itemCount--;
@@ -97,7 +97,7 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         if (minIndex < 0) return default(T);
 
         T min = items[minIndex];
-        if (min.GetValue() <= value)
+        if (min.Value <= value)
         {
             items = ExtensionMethods.RemoveAt(items, minIndex);
             itemCount--;
@@ -150,7 +150,7 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
                 {
                     highestIndex = i;
                 }
-                else if (items[highestIndex].GetValue() < items[i].GetValue()) highestIndex = i;
+                else if (items[highestIndex].Value < items[i].Value) highestIndex = i;
             }
 
             //if (items[highestIndex].GetValue() < items[i].GetValue()) highestIndex = i;
@@ -182,7 +182,7 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
                 {
                     lowestIndex = i;
                 }
-                else if (items[lowestIndex].GetValue() > items[i].GetValue()) lowestIndex = i;
+                else if (items[lowestIndex].Value > items[i].Value) lowestIndex = i;
             }
         }
         return lowestIndex;

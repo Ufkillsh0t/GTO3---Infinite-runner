@@ -243,7 +243,7 @@ public class PlayerScript : MonoBehaviour
             rigidBody.AddForce(Vector3.up * jumpSpeed);
             grounded = false;
             pss.PlayJump();
-            Debug.Log("Jump");
+            //Debug.Log("Jump");
         }
     }
 

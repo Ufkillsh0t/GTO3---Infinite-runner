@@ -15,6 +15,8 @@ public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
 
     public bool IsObjectUsed { get { return pickedUp; } }
 
+    public float Value { get { return GetRange(); } }
+
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
@@ -61,10 +63,5 @@ public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
     private float GetRange()
     {
         return Vector3.Distance(transform.position, player.transform.position);
-    }
-
-    public float GetValue()
-    {
-        return GetRange();
     }
 }
