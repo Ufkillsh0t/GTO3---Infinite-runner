@@ -24,6 +24,7 @@ public class AmbientSounds : MonoBehaviour
     void Start()
     {
         ambient = gameObject.GetComponent<AudioSource>();
+        ambient.volume = PlayerPrefs.GetFloat(PrefKeys.AmbientVolume.ToString());
     }
 
     // Update is called once per frame

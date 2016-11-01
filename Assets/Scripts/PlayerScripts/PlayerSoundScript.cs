@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Audio;
 
 public enum PickUpObject
 {
@@ -35,16 +36,29 @@ public class PlayerSoundScript : MonoBehaviour
     //Picking up coins
     public AudioSource playerPickup;
 
+    //Voor de hoofd audio mixer;
+    public AudioMixerGroup amg;
+
     private bool triggeredDeath;
 
     // Use this for initialization
     void Start()
     {
+        if (amg != null)
+        {
+            amg.audioMixer.SetFloat("Master", PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString()));
+        }
+        else
+        {
+            Debug.Log("Couldn't define the main volume.");
+        }
+
         AudioSource[] sources = gameObject.GetComponents<AudioSource>();
         if (sources[0] != null)
         {
             playerMovement = sources[0];
             playerMovement.loop = false;
+            playerMovement.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {
@@ -54,6 +68,7 @@ public class PlayerSoundScript : MonoBehaviour
         {
             playerInteraction = sources[1];
             playerInteraction.loop = false;
+            playerInteraction.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {
@@ -63,6 +78,7 @@ public class PlayerSoundScript : MonoBehaviour
         {
             playerPickup = sources[2];
             playerPickup.loop = false;
+            playerPickup.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {

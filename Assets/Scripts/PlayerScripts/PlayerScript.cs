@@ -49,7 +49,17 @@ public class PlayerScript : MonoBehaviour
         rigidBody = gameObject.GetComponent<Rigidbody>();
         box = gameObject.GetComponent<BoxCollider>();
         pss = gameObject.GetComponent<PlayerSoundScript>();
-        if (moveAccelerometer == true && moveSlideDistance == true) moveSlideDistance = false;
+        bool toggled = (PlayerPrefs.GetInt(PrefKeys.SlideMovement.ToString()) == 1) ? true : false;
+        if (toggled)
+        {
+            moveSlideDistance = true;
+            moveAccelerometer = false;
+        }
+        else
+        {
+            moveSlideDistance = false;
+            moveAccelerometer = true;
+        }     
     }
 
     // Use this for initialization
