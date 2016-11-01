@@ -6,7 +6,6 @@ public class MagnetScript : MonoBehaviour
 
     private static PlayerScript player;
     private Vector3 startPosition;
-    private float coliderScale = 2f;
     private float duration = 12f;
     private PickUpObject po = PickUpObject.Magnet;
 
@@ -27,9 +26,6 @@ public class MagnetScript : MonoBehaviour
         transform.position = startPosition;
         if (!player.magnetUsed)
         {
-            /*player.BoxCollider.size = new Vector3(player.BoxCollider.size.x * coliderScale, 
-                player.BoxCollider.size.y, 
-                player.BoxCollider.size.z * coliderScale);*/
             player.magnetUsed = true;
         }
         player.MagnetDuration = duration;
