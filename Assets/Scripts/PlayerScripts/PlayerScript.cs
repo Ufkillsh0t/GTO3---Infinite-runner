@@ -29,7 +29,7 @@ public class PlayerScript : MonoBehaviour
     public int collectedCoins = 0;
 
     public bool magnetUsed = false;
-    public int magnetPickupRange = 5;
+    public float magnetPickupRange = 5f;
     private float magnetDuration = 12f;
 
 
@@ -57,6 +57,8 @@ public class PlayerScript : MonoBehaviour
     {
         Physics.gravity = new Vector3(0, -gravity, 0);
         Screen.orientation = ScreenOrientation.LandscapeLeft;
+        pm = GameObject.FindGameObjectWithTag("TerrainGenerator").GetComponent<PlatformManager>();
+        Debug.Log("TEST");
     }
 
     void OnCollisionEnter(Collision col)
@@ -117,12 +119,20 @@ public class PlayerScript : MonoBehaviour
             if (magnetDuration > 0f)
             {
                 magnetDuration -= Time.deltaTime;
+                PickUpNearbyCoin();
             }
             else
             {
                 magnetUsed = false;
-                ColliderReset();
             }
+        }
+    }
+
+    private void PickUpNearbyCoin()
+    {
+        if(pm != null)
+        {
+            pm.PickupCoin(magnetPickupRange);
         }
     }
 

@@ -311,6 +311,16 @@ public class PlatformManager : MonoBehaviour
         coinQueue.Enqueue(coin);
     }
 
+    public void PickupCoin(float range)
+    {
+        CoinScript coin = coinQueue.DequeueMin(range);
+        if (coin != null)
+        {
+            coin.PickUp();
+            coinQueue.Enqueue(coin);
+        }
+    }
+
     private void SpawnMagnet(Vector3 position)
     {
         Transform magnet = magnetQueue.Dequeue();
@@ -318,4 +328,6 @@ public class PlatformManager : MonoBehaviour
         magnet.position = spawnPos;
         magnetQueue.Enqueue(magnet);
     }
+
+
 }

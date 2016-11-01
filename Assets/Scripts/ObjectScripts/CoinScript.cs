@@ -31,9 +31,14 @@ public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
 
     void OnTriggerEnter(Collider other)
     {
+        PickUp();
+    }
+
+    public void PickUp()
+    {
         transform.position = startPosition;
         player.collectedCoins++;
-        pickedUp = true;
+        //pickedUp = true; PickedUp kan er pas in wanneer er een animatie van de coin naar de player in zit.
         //this.enabled = false;
         player.pss.PlayPickup(po);
         //Debug.Log("I got triggered!");
