@@ -8,4 +8,11 @@ interface IValue
     /// </summary>
     /// <returns>The value of this object</returns>
     float GetValue();
+
+    /// <summary>
+    /// Gets wether the object has been used or not.
+    /// If the object is used it won't be removed from the collection.
+    /// </summary>
+    /// <returns>Wether the object is ijn use or not.</returns>
+    bool IsObjectUsed { get; }
 }

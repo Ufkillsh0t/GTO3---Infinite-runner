@@ -40,10 +40,35 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
     public T DequeueMax()
     {
         int maxIndex = MaxIndex();
+        if (maxIndex < 0) return default(T);
+
         T max = items[maxIndex];
         items = ExtensionMethods.RemoveAt(items, maxIndex);
         itemCount--;
         return max;
+    }
+
+    /// <summary>
+    /// Returns and removes the object with the highest value from the collection if the value is higher or the same as the given value.
+    /// </summary>
+    /// <param name="value">The minimum value of the object you want</param>
+    /// <returns>The object with the highest value if it's higher or the same as the given value</returns>
+    public T DequeueMax(float value)
+    {
+        int maxIndex = MaxIndex();
+        if (maxIndex < 0) return default(T);
+
+        T max = items[maxIndex];
+        if (max.GetValue() >= value)
+        {
+            items = ExtensionMethods.RemoveAt(items, maxIndex);
+            itemCount--;
+            return max;
+        }
+        else
+        {
+            return default(T);
+        }
     }
 
     /// <summary>
@@ -53,10 +78,35 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
     public T DequeueMin()
     {
         int minIndex = MinIndex();
+        if (minIndex < 0) return default(T);
+
         T min = items[minIndex];
         items = ExtensionMethods.RemoveAt(items, minIndex);
         itemCount--;
         return min;
+    }
+
+    /// <summary>
+    /// Returns and removes the object with the lowest value from the collection if the value is lower or the same as the given value.
+    /// </summary>
+    /// <param name="value">The maximum value of the object you want</param>
+    /// <returns>The object with the lowest value if it's below or the same as the given value</returns>
+    public T DequeueMin(float value)
+    {
+        int minIndex = MinIndex();
+        if (minIndex < 0) return default(T);
+
+        T min = items[minIndex];
+        if (min.GetValue() <= value)
+        {
+            items = ExtensionMethods.RemoveAt(items, minIndex);
+            itemCount--;
+            return min;
+        }
+        else
+        {
+            return default(T);
+        }
     }
 
     /// <summary>
@@ -91,10 +141,19 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
     /// <returns>The index of the item with the highest value</returns>
     private int MaxIndex()
     {
-        int highestIndex = 0;
-        for (int i = 1; i < itemCount; i++)
+        int highestIndex = -1;
+        for (int i = 0; i < itemCount; i++)
         {
-            if (items[highestIndex].GetValue() < items[i].GetValue()) highestIndex = i;
+            if(!items[i].IsObjectUsed)
+            {
+                if (highestIndex < 0)
+                {
+                    highestIndex = i;
+                }
+                else if (items[highestIndex].GetValue() < items[i].GetValue()) highestIndex = i;
+            }
+
+            //if (items[highestIndex].GetValue() < items[i].GetValue()) highestIndex = i;
         }
         return highestIndex;
     }
@@ -114,10 +173,17 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
     /// <returns>The index of the item with the lowest value</returns>
     private int MinIndex()
     {
-        int lowestIndex = 0;
-        for (int i = 1; i < itemCount; i++)
+        int lowestIndex = -1;
+        for (int i = 0; i < itemCount; i++)
         {
-            if (items[lowestIndex].GetValue() > items[i].GetValue()) lowestIndex = i;
+            if (!items[i].IsObjectUsed)
+            {
+                if(lowestIndex < 0)
+                {
+                    lowestIndex = i;
+                }
+                else if (items[lowestIndex].GetValue() > items[i].GetValue()) lowestIndex = i;
+            }
         }
         return lowestIndex;
     }

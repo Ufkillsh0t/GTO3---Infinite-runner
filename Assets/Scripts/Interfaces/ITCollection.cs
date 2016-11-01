@@ -22,6 +22,13 @@ interface ITCollection<T>
     T DequeueMin();
 
     /// <summary>
+    /// Returns and removes the object with the lowest value from the collection if the value is lower than the given value.
+    /// </summary>
+    /// <param name="value">The maximum value of the object you want</param>
+    /// <returns>The object with the lowest value if it's below or the same as the given value</returns>
+    T DequeueMin(float value);
+
+    /// <summary>
     /// Returns and removes the object with the highest value from the collection.
     /// </summary>
     /// <returns></returns>
