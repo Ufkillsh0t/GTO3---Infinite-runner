@@ -46,7 +46,10 @@ public class GameController : MonoBehaviour
 
     private PlayerScript player;
 
-
+    void Awake()
+    {
+        Time.timeScale = 1;
+    }
 
     void Start()
     {
