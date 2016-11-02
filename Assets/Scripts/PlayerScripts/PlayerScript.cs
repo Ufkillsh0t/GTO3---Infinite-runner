@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class PlayerScript : MonoBehaviour
 
     private float feetTime = 0f;
 
+    public Text scoreText;
     public int collectedCoins = 0;
 
     public bool magnetUsed = false;
@@ -59,7 +61,9 @@ public class PlayerScript : MonoBehaviour
         {
             moveSlideDistance = false;
             moveAccelerometer = true;
-        }     
+        }
+
+        if (scoreText != null) scoreText.text = collectedCoins.ToString();
     }
 
     // Use this for initialization
@@ -103,6 +107,8 @@ public class PlayerScript : MonoBehaviour
         {
             pss.PlayDeathSound();
         }
+
+        if (scoreText != null) scoreText.text = collectedCoins.ToString();
 
         PlayFeet();
         MagnetUsed();

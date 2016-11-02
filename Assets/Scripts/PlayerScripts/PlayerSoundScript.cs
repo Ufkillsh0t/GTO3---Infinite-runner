@@ -39,26 +39,20 @@ public class PlayerSoundScript : MonoBehaviour
     //Voor de hoofd audio mixer;
     public AudioMixerGroup amg;
 
+    //GameController;
+    private GameController gc;
+
     private bool triggeredDeath;
 
     // Use this for initialization
     void Start()
     {
-        if (amg != null)
-        {
-            amg.audioMixer.SetFloat("Master", PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString()));
-        }
-        else
-        {
-            Debug.Log("Couldn't define the main volume.");
-        }
-
         AudioSource[] sources = gameObject.GetComponents<AudioSource>();
         if (sources[0] != null)
         {
             playerMovement = sources[0];
             playerMovement.loop = false;
-            playerMovement.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
+            //playerMovement.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {
@@ -68,7 +62,7 @@ public class PlayerSoundScript : MonoBehaviour
         {
             playerInteraction = sources[1];
             playerInteraction.loop = false;
-            playerInteraction.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
+            //playerInteraction.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {
@@ -78,12 +72,14 @@ public class PlayerSoundScript : MonoBehaviour
         {
             playerPickup = sources[2];
             playerPickup.loop = false;
-            playerPickup.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
+            //playerPickup.volume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
         }
         else
         {
             Debug.Log("Audiosource 2 missing no pickup sound!");
         }
+
+        gc = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
         triggeredDeath = false;
     }
@@ -178,6 +174,8 @@ public class PlayerSoundScript : MonoBehaviour
         playerInteraction.Play();
 
         yield return new WaitForSeconds(playerInteraction.clip.length);
+
+        gc.Death();
 
         SceneManager.LoadScene(0);
     }

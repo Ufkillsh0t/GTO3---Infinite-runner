@@ -7,8 +7,12 @@ public class GameController : MonoBehaviour
 
     public AudioMixer masterMixer;
 
+    [Range(-80, 20)]
+    public float masterVolume = 100f;
+    private float currentMasterVolume;
+
     [Range(-80,20)]
-    public float musicVolume = 80f;
+    public float musicVolume = 100f;
     private float currentMusicVolume;
 
     [Range(-80, 20)]
@@ -31,9 +35,12 @@ public class GameController : MonoBehaviour
     public float playerVolume = 100f;
     private float currentPlayerVolume;
 
+    private PlayerScript player;
+
     void Start()
     {
         InitializeSounds();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
     }
 
     void Update()
@@ -43,8 +50,15 @@ public class GameController : MonoBehaviour
 
     private void InitializeSounds()
     {
+        float mmMasterVolume;
+        masterMixer.GetFloat("masterVolume", out mmMasterVolume);
+        currentMasterVolume = mmMasterVolume;
+
         float mmMusicVolume;
-        masterMixer.GetFloat("musicVolume", out mmMusicVolume);
+        masterMixer.GetFloat("musicVolume", out mmMusicVolume); /*
+        float pMusicVolume = PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString());
+        if (mmMusicVolume != pMusicVolume) masterMixer.SetFloat("musicVolume", pMusicVolume);
+        masterMixer.GetFloat("Master", out mmMusicVolume); */
         currentMusicVolume = mmMusicVolume;
 
         float mmAmbientVolume;
@@ -67,22 +81,36 @@ public class GameController : MonoBehaviour
         masterMixer.GetFloat("playerVolume", out mmPlayerVolume);
         currentPlayerVolume = mmMusicVolume;
 
+        masterVolume = (PlayerPrefs.GetFloat(PrefKeys.MasterVolume.ToString()) * 100) -80;
         musicVolume = currentPlayerPickupVolume;
-        ambientVolume = currentAmbientVolume;
+        ambientVolume = (PlayerPrefs.GetFloat(PrefKeys.AmbientVolume.ToString()) * 100) -80;
         enemyVolume = currentEnemyVolume;
         playerInteractionVolume = currentPlayerInteractionVolume;
         playerPickupVolume = currentPlayerPickupVolume;
-        playerVolume = currentPlayerVolume;
+        playerVolume = (PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString()) * 100) -80;
+        SetMusicVolume();
     }
 
     private void UpdateSounds()
     {
+        SetMusicVolume();
+    }
+
+    private void SetMusicVolume()
+    {
+        if (masterVolume != currentMasterVolume) SetMasterVolume(masterVolume);
         if (musicVolume != currentMusicVolume) SetMusicVolume(musicVolume);
         if (ambientVolume != currentAmbientVolume) SetAmbientVolume(ambientVolume);
         if (enemyVolume != currentEnemyVolume) SetEnemyVolume(enemyVolume);
         if (playerInteractionVolume != currentPlayerInteractionVolume) SetPlayerInteractionVolume(playerInteractionVolume);
         if (playerPickupVolume != currentPlayerPickupVolume) SetPlayerPickupVolume(playerPickupVolume);
         if (playerVolume != currentPlayerVolume) SetPlayerVolume(playerVolume);
+    }
+
+    public void SetMasterVolume(float mv)
+    {
+        masterMixer.SetFloat("masterVolume", mv);
+        currentMasterVolume = mv;
     }
 
     public void SetAmbientVolume(float av)
@@ -119,5 +147,14 @@ public class GameController : MonoBehaviour
     {
         masterMixer.SetFloat("playerVolume", pv);
         currentPlayerVolume = pv;
+    }
+
+    public void Death()
+    {
+        int oldhighscore = PlayerPrefs.GetInt(PrefKeys.Highscore.ToString());
+
+        if (oldhighscore < player.collectedCoins) PlayerPrefs.SetInt(PrefKeys.Highscore.ToString(), oldhighscore);
+
+        PlayerPrefs.Save();
     }
 }
