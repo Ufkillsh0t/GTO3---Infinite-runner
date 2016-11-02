@@ -151,9 +151,11 @@ public class GameController : MonoBehaviour
 
     public void Death()
     {
-        int oldhighscore = PlayerPrefs.GetInt(PrefKeys.Highscore.ToString());
+        int oldHighscore = PlayerPrefs.GetInt(PrefKeys.Highscore.ToString());
 
-        if (oldhighscore < player.collectedCoins) PlayerPrefs.SetInt(PrefKeys.Highscore.ToString(), oldhighscore);
+        if (oldHighscore < player.collectedCoins) PlayerPrefs.SetInt(PrefKeys.Highscore.ToString(), player.collectedCoins);
+
+        int newHighscore = PlayerPrefs.GetInt(PrefKeys.Highscore.ToString());
 
         PlayerPrefs.Save();
     }
