@@ -173,11 +173,9 @@ public class PlayerSoundScript : MonoBehaviour
         playerInteraction.clip = deathSounds[Random.Range(0, (deathSounds.Length))];
         playerInteraction.Play();
 
-        yield return new WaitForSeconds(playerInteraction.clip.length);
+        yield return new WaitForSeconds((playerInteraction.clip.length / 2));
 
         gc.Death();
-
-        SceneManager.LoadScene(0);
     }
 
 }

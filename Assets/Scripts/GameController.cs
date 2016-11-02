@@ -1,10 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
 
+    //The score panel to display the score
+    public GameObject scorePanel;
+
+    //The death panel which will show once you are dead.
+    public GameObject deathPanel;
+
+    //The audiomixer which controls all the audio.
     public AudioMixer masterMixer;
 
     [Range(-80, 20)]
@@ -35,10 +43,16 @@ public class GameController : MonoBehaviour
     public float playerVolume = 100f;
     private float currentPlayerVolume;
 
+
     private PlayerScript player;
+
+
 
     void Start()
     {
+        if (deathPanel != null) deathPanel.SetActive(false);
+        if (scorePanel != null) scorePanel.SetActive(true);
+
         InitializeSounds();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
     }
@@ -156,6 +170,17 @@ public class GameController : MonoBehaviour
         if (oldHighscore < player.collectedCoins) PlayerPrefs.SetInt(PrefKeys.Highscore.ToString(), player.collectedCoins);
 
         int newHighscore = PlayerPrefs.GetInt(PrefKeys.Highscore.ToString());
+
+        if (deathPanel != null)
+        {
+            deathPanel.SetActive(true);
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
+        }
+
+        Time.timeScale = 0;
 
         PlayerPrefs.Save();
     }
