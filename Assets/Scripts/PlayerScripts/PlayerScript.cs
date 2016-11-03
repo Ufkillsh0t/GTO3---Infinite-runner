@@ -13,6 +13,11 @@ public class PlayerScript : MonoBehaviour
     public float zSpeed = 10f;
     public float mobileSpeedMultiplier = 0.25f;
     public float maxSwipeMultiplier = 1.2f;
+    public float speedSlowdown = 0.25f;
+    public float currentSpeedMultiplier = 1.0f;
+    public float minSpeed = 0.5f;
+    public float defaultSpeed = 1.0f;
+    public float maxSpeed = 2f;
 
     public bool grounded = false;
 
@@ -90,7 +95,8 @@ public class PlayerScript : MonoBehaviour
         if (SystemInfo.deviceType == DeviceType.Desktop && !stream_mobile_debug)
         {
             float horizontal = Input.GetAxis("Horizontal");
-            //float vertical = Input.GetAxis("Vertical");
+            float vertical = Input.GetAxis("Vertical");
+            SetCurrentSpeed(vertical);
 
             if (Input.GetKey(KeyCode.Space))
             {
@@ -115,6 +121,45 @@ public class PlayerScript : MonoBehaviour
 
         PlayFeet();
         MagnetUsed();
+    }
+
+    private void SetCurrentSpeed(float input)
+    {
+        if (input < -0.5f)
+        {
+            if (currentSpeedMultiplier > minSpeed)
+            {
+                currentSpeedMultiplier -= Time.deltaTime * speedSlowdown;
+                CheckSpeed();
+            }
+        }
+        else if (input <= 0.5f)
+        {
+            if (currentSpeedMultiplier < defaultSpeed)
+            {
+                currentSpeedMultiplier += Time.deltaTime * speedSlowdown;
+                if (currentSpeedMultiplier > defaultSpeed) currentSpeedMultiplier = defaultSpeed;
+            }
+            else
+            {
+                currentSpeedMultiplier -= Time.deltaTime * speedSlowdown;
+                if (currentSpeedMultiplier < defaultSpeed) currentSpeedMultiplier = defaultSpeed;
+            }
+        }
+        else if (input > 0.5f)
+        {
+            if (currentSpeedMultiplier < maxSpeed)
+            {
+                currentSpeedMultiplier += Time.deltaTime * speedSlowdown;
+                CheckSpeed();
+            }
+        }
+    }
+
+    private void CheckSpeed()
+    {
+        if (currentSpeedMultiplier < minSpeed) currentSpeedMultiplier = minSpeed;
+        if (currentSpeedMultiplier > maxSpeed) currentSpeedMultiplier = maxSpeed;
     }
 
     private void PlayFeet()
@@ -149,7 +194,7 @@ public class PlayerScript : MonoBehaviour
 
     private void PickUpNearbyCoin()
     {
-        if(pm != null)
+        if (pm != null)
         {
             pm.PickupCoin(magnetPickupRange);
         }
@@ -178,10 +223,17 @@ public class PlayerScript : MonoBehaviour
                                     jumpSpeed * Time.deltaTime,
                                     -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);*/
             }
-            else
+            switch (controller.currentState)
             {
-                transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0, -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);
+                case Gestures.TwoFingerSwipeOutwards:
+                    SetCurrentSpeed(1);
+                    break;
+                case Gestures.TwoFingerTouch:
+                    SetCurrentSpeed(-1);
+                    break;
             }
+            Move();
+            transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0, 0);
         }
         else
         {
@@ -213,10 +265,10 @@ public class PlayerScript : MonoBehaviour
                     UseItem();
                     break;
                 case Gestures.TwoFingerSwipeOutwards:
-                    Debug.Log("Outwards swipe");
+                    SetCurrentSpeed(1);
                     break;
                 case Gestures.TwoFingerTouch:
-                    Debug.Log("Two finger touch");
+                    SetCurrentSpeed(-1);
                     break;
             }
         }
@@ -262,7 +314,7 @@ public class PlayerScript : MonoBehaviour
 
     private void UseItem()
     {
-        Debug.Log("Used an item");
+        //Debug.Log("Used an item");
     }
 
     private void Jump()
@@ -272,7 +324,6 @@ public class PlayerScript : MonoBehaviour
             rigidBody.AddForce(Vector3.up * jumpSpeed);
             grounded = false;
             pss.PlayJump();
-            //Debug.Log("Jump");
         }
     }
 
@@ -287,13 +338,11 @@ public class PlayerScript : MonoBehaviour
         {
             float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultiplier ? controller.swipeDistanceCurrentStateX : maxSwipeMultiplier;
             transform.Translate(-xSpeed * swipeMultiplier * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
-            Debug.Log("Multiplier " + swipeMultiplier);
         }
         else
         {
             transform.Translate(-xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
         }
-        Debug.Log("Moved to the left");
     }
 
     private void MoveRight()
@@ -301,19 +350,17 @@ public class PlayerScript : MonoBehaviour
         if (moveSlideDistance)
         {
             float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultiplier ? controller.swipeDistanceCurrentStateX : maxSwipeMultiplier;
-            Debug.Log("Multiplier " + swipeMultiplier);
-            transform.Translate(xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
+            transform.Translate(xSpeed * swipeMultiplier * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
         }
         else
         {
             transform.Translate(xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
         }
-        Debug.Log("Moved to the right");
     }
 
     private void Move()
     {
-        transform.Translate(0f, 0f, zSpeed * mobileSpeedMultiplier * Time.deltaTime);
+        transform.Translate(0f, 0f, zSpeed * mobileSpeedMultiplier * currentSpeedMultiplier * Time.deltaTime);
     }
 
     private void ColliderReset()
