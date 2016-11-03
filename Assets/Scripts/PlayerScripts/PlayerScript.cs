@@ -48,6 +48,7 @@ public class PlayerScript : MonoBehaviour
     public PlayerSoundScript pss;
     public ParticleSystem coinParticleSystem;
     public ParticleSystem magnetParticleSystem;
+    public ParticleSystem landParticleSystem;
 
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
@@ -83,8 +84,16 @@ public class PlayerScript : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        pss.PlayLanding();
-        grounded = true;
+        if (transform.position.y > (col.transform.position.y + (col.transform.localScale.y / 2)))
+        {
+            pss.PlayLanding();
+            grounded = true;
+            if (landParticleSystem != null) landParticleSystem.Play();
+        }
+        else
+        {
+            zSpeed = 0;
+        }
     }
 
     // Update is called once per frame
