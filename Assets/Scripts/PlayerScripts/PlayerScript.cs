@@ -231,6 +231,7 @@ public class PlayerScript : MonoBehaviour
                                     jumpSpeed * Time.deltaTime,
                                     -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);*/
             }
+            SetCurrentSpeed(-Input.acceleration.z); /*
             switch (controller.currentState)
             {
                 case Gestures.TwoFingerSwipeOutwards:
@@ -239,7 +240,7 @@ public class PlayerScript : MonoBehaviour
                 case Gestures.TwoFingerTouch:
                     SetCurrentSpeed(-Input.acceleration.z);
                     break;
-            }
+            }*/
             Move();
             transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0, 0);
         }
