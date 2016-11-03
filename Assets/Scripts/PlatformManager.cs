@@ -11,6 +11,7 @@ public enum Spawns
 
 public enum CoinSpawn
 {
+    Platform,
     Line,
     Single
 }
@@ -41,15 +42,18 @@ public class PlatformManager : MonoBehaviour
     public int noneChance = 30;
     public int coinChance = 20;
     public int magnetChance = 100;
+    public int magnetPlatformDistance = 5;
     private GameObject player;
 
     private int totalChance;
-
+    private int latestMagnet;
 
     // Use this for initialization
     void Start()
     {
         totalChance = noneChance + coinChance + magnetChance;
+        latestMagnet = magnetPlatformDistance;
+        numberOfCoins = ((int)platformMaxSize.x * (int)platformMaxSize.z * numberOfPlatforms) /3;
 
         gridSize = new Vector3(1, 1, 1);
 
@@ -130,11 +134,23 @@ public class PlatformManager : MonoBehaviour
 
     private void Recycle()
     {
-        Vector3 scale = new Vector3(
-            Random.Range(platformMinSize.x, platformMaxSize.x),
-            Random.Range(platformMinSize.y, platformMaxSize.y),
-            Random.Range(platformMinSize.z, platformMaxSize.z)
-            );
+        Vector3 scale;
+        if (platformStartPosition == platformNextPosition)
+        {
+            scale = new Vector3(
+                12,
+                Random.Range(platformMinSize.y, platformMaxSize.y),
+                Random.Range(platformMinSize.z, platformMaxSize.z)
+                );
+        }
+        else
+        {
+            scale = new Vector3(
+                Random.Range(platformMinSize.x, platformMaxSize.x),
+                Random.Range(platformMinSize.y, platformMaxSize.y),
+                Random.Range(platformMinSize.z, platformMaxSize.z)
+                );
+        }
 
         /*
         int grids = GetGrids(scale);
@@ -151,7 +167,11 @@ public class PlatformManager : MonoBehaviour
         platform.GetComponent<Renderer>().material.color = Color.HSVToRGB(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
         platformQueue.Enqueue(platform);
 
-        SpawnGridsPlatform(position, scale);
+        if (platformNextPosition != platformStartPosition)
+        {
+            latestMagnet--;
+            SpawnGridsPlatform(position, scale);
+        }
 
         platformNextPosition += new Vector3(
             Random.Range(platformMinGap.x, platformMaxGap.x) + scale.x,
@@ -190,19 +210,25 @@ public class PlatformManager : MonoBehaviour
     {
         Spawns[,] gridSpawnArray = new Spawns[gridsZ, gridsX];
 
+        bool magnetSpawned = (latestMagnet > 0) ? true : false;
+        int chance = Random.Range(0, totalChance);
+        Spawns spawn = GetSpawnByChance(chance);
+
         for (int z = 0; z < gridSpawnArray.GetLength(0); z++)
         {
-            int chance = Random.Range(0, totalChance);
-            Spawns spawn = GetSpawnByChance(chance);
-            bool magnetSpawned = false;
+            if (coinSpawnType == CoinSpawn.Line && z > 0)
+            {
+                chance = Random.Range(0, totalChance);
+                spawn = GetSpawnByChance(chance);
+            }
 
             for (int x = 0; x < gridSpawnArray.GetLength(1); x++)
             {
-                if (coinSpawnType == CoinSpawn.Line && spawn == Spawns.Coin)
+                if ((coinSpawnType == CoinSpawn.Line || coinSpawnType == CoinSpawn.Platform) && spawn == Spawns.Coin)
                 {
                     gridSpawnArray[z, x] = spawn;
                 }
-                else if (coinSpawnType != CoinSpawn.Line && x > 0)
+                else if ((coinSpawnType != CoinSpawn.Line && coinSpawnType != CoinSpawn.Platform) && x > 0)
                 {
                     chance = Random.Range(0, totalChance);
                     spawn = GetSpawnByChance(chance);
@@ -215,6 +241,7 @@ public class PlatformManager : MonoBehaviour
                         else
                         {
                             magnetSpawned = true;
+                            latestMagnet = magnetPlatformDistance;
                         }
                     }
                     gridSpawnArray[z, x] = spawn;
@@ -229,6 +256,7 @@ public class PlatformManager : MonoBehaviour
                     {
                         gridSpawnArray[z, x] = spawn;
                         magnetSpawned = true;
+                        latestMagnet = magnetPlatformDistance;
                     }
                 }
             }

@@ -24,12 +24,10 @@ public class MagnetScript : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         transform.position = startPosition;
-        if (!player.magnetUsed)
-        {
-            player.magnetUsed = true;
-        }
+        if (!player.magnetUsed) player.magnetUsed = true;
+        if (player.magnetParticleSystem != null) player.magnetParticleSystem.Play();
         player.MagnetDuration = duration;
         player.pss.PlayPickup(po);
-        Debug.Log("I got triggered!");
+        //Debug.Log("I got triggered!");
     }
 }

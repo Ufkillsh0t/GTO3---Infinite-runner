@@ -12,7 +12,7 @@ public class PlayerScript : MonoBehaviour
     public float xSpeed = 10f;
     public float zSpeed = 10f;
     public float mobileSpeedMultiplier = 0.25f;
-    public float maxSwipeMultipler = 1.2f;
+    public float maxSwipeMultiplier = 1.2f;
 
     public bool grounded = false;
 
@@ -41,6 +41,8 @@ public class PlayerScript : MonoBehaviour
     private PlatformManager pm;
 
     public PlayerSoundScript pss;
+    public ParticleSystem coinParticleSystem;
+    public ParticleSystem magnetParticleSystem;
 
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
@@ -72,7 +74,6 @@ public class PlayerScript : MonoBehaviour
         Physics.gravity = new Vector3(0, -gravity, 0);
         Screen.orientation = ScreenOrientation.LandscapeLeft;
         pm = GameObject.FindGameObjectWithTag("TerrainGenerator").GetComponent<PlatformManager>();
-        Debug.Log("TEST");
     }
 
     void OnCollisionEnter(Collision col)
@@ -96,7 +97,9 @@ public class PlayerScript : MonoBehaviour
                 Jump();
                 //transform.Translate(xSpeed * horizontal * Time.deltaTime, jumpSpeed * Time.deltaTime, zSpeed * vertical * Time.deltaTime);
             }
-            transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
+            //transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
+            transform.Translate(xSpeed * horizontal * Time.deltaTime * 2, 0, 0);
+            Move();
         }
         else if (SystemInfo.deviceType != DeviceType.Console || stream_mobile_debug)
         {
@@ -192,7 +195,7 @@ public class PlayerScript : MonoBehaviour
         {
             GestureStates();
             GestureMoves();
-            if (!moveAccelerometer) Move();
+            Move();
         }
         else
         {
@@ -282,7 +285,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (moveSlideDistance)
         {
-            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultipler ? controller.swipeDistanceCurrentStateX : maxSwipeMultipler;
+            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultiplier ? controller.swipeDistanceCurrentStateX : maxSwipeMultiplier;
             transform.Translate(-xSpeed * swipeMultiplier * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
             Debug.Log("Multiplier " + swipeMultiplier);
         }
@@ -297,7 +300,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (moveSlideDistance)
         {
-            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultipler ? controller.swipeDistanceCurrentStateX : maxSwipeMultipler;
+            float swipeMultiplier = controller.swipeDistanceCurrentStateX < maxSwipeMultiplier ? controller.swipeDistanceCurrentStateX : maxSwipeMultiplier;
             Debug.Log("Multiplier " + swipeMultiplier);
             transform.Translate(xSpeed * controller.swipeDistanceCurrentStateX * mobileSpeedMultiplier * Time.deltaTime, 0f, 0f);
         }

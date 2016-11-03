@@ -41,6 +41,7 @@ public class CoinScript : MonoBehaviour, IComparable<CoinScript>, IValue
         //pickedUp = true; PickedUp kan er pas in wanneer er een animatie van de coin naar de player in zit.
         //this.enabled = false;
         player.pss.PlayPickup(po);
+        if (player.coinParticleSystem != null) player.coinParticleSystem.Play();
         //Debug.Log("I got triggered!");
     }
 
