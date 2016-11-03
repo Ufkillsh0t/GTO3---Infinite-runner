@@ -273,12 +273,6 @@ public class PlayerScript : MonoBehaviour
                 case Gestures.Touch:
                     UseItem();
                     break;
-                case Gestures.TwoFingerSwipeOutwards:
-                    SetCurrentSpeed(1);
-                    break;
-                case Gestures.TwoFingerTouch:
-                    SetCurrentSpeed(-1);
-                    break;
             }
         }
     }
@@ -316,6 +310,12 @@ public class PlayerScript : MonoBehaviour
                     break;
                 case Gestures.SwipeDown:
                     Slide();
+                    break;
+                case Gestures.TwoFingerSwipeOutwards:
+                    SetCurrentSpeed(1);
+                    break;
+                case Gestures.TwoFingerTouch:
+                    SetCurrentSpeed(-1);
                     break;
             }
         }
