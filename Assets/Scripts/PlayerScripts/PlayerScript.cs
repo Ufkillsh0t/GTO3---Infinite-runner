@@ -98,7 +98,7 @@ public class PlayerScript : MonoBehaviour
                 //transform.Translate(xSpeed * horizontal * Time.deltaTime, jumpSpeed * Time.deltaTime, zSpeed * vertical * Time.deltaTime);
             }
             //transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, zSpeed * vertical * Time.deltaTime);
-            transform.Translate(xSpeed * horizontal * Time.deltaTime * 2, 0, 0);
+            transform.Translate(xSpeed * horizontal * Time.deltaTime, 0, 0);
             Move();
         }
         else if (SystemInfo.deviceType != DeviceType.Console || stream_mobile_debug)
