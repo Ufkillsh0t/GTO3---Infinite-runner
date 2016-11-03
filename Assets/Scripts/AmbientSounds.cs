@@ -4,7 +4,7 @@ using System.Collections;
 public class AmbientSounds : MonoBehaviour
 {
 
-    private static PlayerScript player;
+    //private PlayerScript player;
 
     //Ambient sounds
     public AudioClip[] ambientSounds;
@@ -14,15 +14,9 @@ public class AmbientSounds : MonoBehaviour
 
     public int ambientChance = 500;
 
-
-    // Use this for initialization
-    void Awake()
-    {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
-    }
-
     void Start()
     {
+        //player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
         ambient = gameObject.GetComponent<AudioSource>();
         //ambient.volume = PlayerPrefs.GetFloat(PrefKeys.AmbientVolume.ToString());
     }

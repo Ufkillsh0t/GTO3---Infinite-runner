@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -15,11 +16,14 @@ public class GameController : MonoBehaviour
     //The audiomixer which controls all the audio.
     public AudioMixer masterMixer;
 
+    //The text of the deathPanel
+    public Text deathPanelText;
+
     [Range(-80, 20)]
     public float masterVolume = 100f;
     private float currentMasterVolume;
 
-    [Range(-80,20)]
+    [Range(-80, 20)]
     public float musicVolume = 100f;
     private float currentMusicVolume;
 
@@ -53,8 +57,9 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        if (deathPanel != null) deathPanel.SetActive(false);
         if (scorePanel != null) scorePanel.SetActive(true);
+        if (deathPanel != null) deathPanel.SetActive(false);
+
 
         InitializeSounds();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
@@ -98,13 +103,13 @@ public class GameController : MonoBehaviour
         masterMixer.GetFloat("playerVolume", out mmPlayerVolume);
         currentPlayerVolume = mmMusicVolume;
 
-        masterVolume = (PlayerPrefs.GetFloat(PrefKeys.MasterVolume.ToString()) * 100) -80;
+        masterVolume = (PlayerPrefs.GetFloat(PrefKeys.MasterVolume.ToString()) * 100) - 80;
         musicVolume = currentPlayerPickupVolume;
-        ambientVolume = (PlayerPrefs.GetFloat(PrefKeys.AmbientVolume.ToString()) * 100) -80;
+        ambientVolume = (PlayerPrefs.GetFloat(PrefKeys.AmbientVolume.ToString()) * 100) - 80;
         enemyVolume = currentEnemyVolume;
         playerInteractionVolume = currentPlayerInteractionVolume;
         playerPickupVolume = currentPlayerPickupVolume;
-        playerVolume = (PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString()) * 100) -80;
+        playerVolume = (PlayerPrefs.GetFloat(PrefKeys.PlayerVolume.ToString()) * 100) - 80;
         SetMusicVolume();
     }
 
@@ -176,6 +181,7 @@ public class GameController : MonoBehaviour
 
         if (deathPanel != null)
         {
+            if (deathPanelText != null) deathPanelText.text += newHighscore.ToString();
             deathPanel.SetActive(true);
         }
         else

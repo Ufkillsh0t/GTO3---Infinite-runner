@@ -90,7 +90,7 @@ public class PlayerScript : MonoBehaviour
         if (SystemInfo.deviceType == DeviceType.Desktop && !stream_mobile_debug)
         {
             float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+            //float vertical = Input.GetAxis("Vertical");
 
             if (Input.GetKey(KeyCode.Space))
             {
