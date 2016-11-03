@@ -78,7 +78,6 @@ public class PlayerScript : MonoBehaviour
     void Start()
     {
         Physics.gravity = new Vector3(0, -gravity, 0);
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
         pm = GameObject.FindGameObjectWithTag("TerrainGenerator").GetComponent<PlatformManager>();
     }
 
@@ -235,10 +234,10 @@ public class PlayerScript : MonoBehaviour
             switch (controller.currentState)
             {
                 case Gestures.TwoFingerSwipeOutwards:
-                    SetCurrentSpeed(1);
+                    SetCurrentSpeed(-Input.acceleration.z);
                     break;
                 case Gestures.TwoFingerTouch:
-                    SetCurrentSpeed(-1);
+                    SetCurrentSpeed(-Input.acceleration.z);
                     break;
             }
             Move();

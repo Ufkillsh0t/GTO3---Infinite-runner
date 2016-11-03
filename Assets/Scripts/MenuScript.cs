@@ -17,6 +17,10 @@ public class MenuScript : MonoBehaviour
     public int highscore = -1;
     public bool toggled;
 
+    void Awake()
+    {
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+    }
 
     void Start()
     {
