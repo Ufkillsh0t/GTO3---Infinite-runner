@@ -199,7 +199,7 @@ internal class TCollection<T> : ITCollection<T> where T : IValue
         {
             if (EqualityComparer<T>.Default.Equals(item))
             {
-                items = ExtensionMethods.RemoveAt(items, i);
+                items.RemoveAt(i);
                 return true;
                 //items = items.Where((source, index) => index != i).ToArray();
             }

@@ -3,37 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SpawnedObjectType
+{
+    None,
+    Coin,
+    Item,
+    Obstacle
+}
+
+public enum SpawnObject
+{
+    None,
+    SmallCoin,
+    MediumCoin,
+    BigCoin,
+    Magnet,
+    SpeedBoost,
+    SlowDown,
+    PlatformIncrease,
+    PlatformDecrease,
+    Spike,
+    Box,
+    Mud,
+    HoveringBox
+}
+
 public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>
 {
-
-    public enum SpawnedObjectType
-    {
-        None,
-        Coin,
-        Item,
-        Obstacle
-    }
-
-    public enum SpawnType
-    {
-        None,
-        SmallCoin,
-        MediumCoin,
-        BigCoin,
-        Magnet,
-        SpeedBoost,
-        SlowDown,
-        PlatformIncrease,
-        PlatformDecrease,
-        Spike,
-        Box,
-        Mud,
-        HoveringBox
-    }
-
     public Vector3 resetPosition = Vector3.zero;
     public SpawnedObjectType spawnedObjectType = SpawnedObjectType.None;
-    public SpawnType spawnType = SpawnType.None;
+    public SpawnObject spawnType = SpawnObject.None;
     public bool rotateOnSmoothPickup = true;
     public bool lookAtPlayerIfNoRotateSmoothPickup = true;
     public bool pickUpObjectSmoothly = true;
