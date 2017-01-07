@@ -50,11 +50,15 @@ public class PlayerScript : MonoBehaviour
     public ParticleSystem magnetParticleSystem;
     public ParticleSystem landParticleSystem;
 
+    private static PlayerScript instance;
+
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
+    public static PlayerScript Instance { get { return instance; } }
 
     void Awake()
     {
+        instance = this;
         controller = gameObject.GetComponent<GestureController>();
         rigidBody = gameObject.GetComponent<Rigidbody>();
         box = gameObject.GetComponent<BoxCollider>();
