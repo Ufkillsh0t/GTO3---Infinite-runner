@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformScript : MonoBehaviour {
+public class PlatformScript : MonoBehaviour
+{
 
     public enum SpawnType
     {
+        Platform,
         LineX,
         LineZ,
-        Platform,
         Random,
         RandomLineX,
         RandomLineZ,
@@ -41,21 +42,26 @@ public class PlatformScript : MonoBehaviour {
     public const float maxSpawnObjectChance = 100f;
     public const float minSpawnedObjectTypeChance = 0f;
     public const float maxSpawnedObjectTypeChance = 100f;
+    public int maxObstaclesPlatform = 3;
+    public int itemPlatformDistance = 6;
+    private int curLastItemPlatform = 0;
     public bool oneItemPlatform = true;
     public bool center = true; //Centers the object if possible (When the object next to it is non existent for example)
     public bool placeNextToItem = true;
     public SpawnType spawnType;
     public SpawnObjectTypeChance[] spawnObjectTypeChances;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Use this for initialization
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     /// <summary>
     /// Returns an array with the grids and the item to spawn on there.
@@ -66,11 +72,190 @@ public class PlatformScript : MonoBehaviour {
         return null;
     }
 
+    /// <summary>
+    /// Generates an array with random objecttypes and where to spawn them.
+    /// </summary>
+    /// <returns>Randomized ObjectType multidimensional array.</returns>
     public SpawnedObjectType[,] GenerateSpawnObjectTypesArray()
     {
-        SpawnedObjectType[,] spawns = new SpawnedObjectType[GetGridsX(), GetGridsZ()];  //Misschien vervangen naar de dimensie van de huidige platformObjects.
+        switch (spawnType)
+        {
+            case SpawnType.Platform:
+                return GenerateSpawnObjectTypesArrayPlatform();
+            case SpawnType.LineX:
+                return GenerateSpawnObjectTypesArrayLineX();
+            case SpawnType.LineZ:
+                return GenerateSpawnObjectTypesArrayLineZ();
+            case SpawnType.Random:
+                return GenerateSpawnObjectTypesArrayRandom();
+            case SpawnType.RandomLineX:
+                return GenerateSpawnObjectTypesArrayRandomLineX();
+            case SpawnType.RandomLineZ:
+                return GenerateSpawnObjectTypesArrayRandomLineZ();
+            case SpawnType.Sectioned:
+                return GenerateSpawnObjectTypesArraySectioned();
+            case SpawnType.Single:
+                return GenerateSpawnObjectTypesArraySingle();
+        }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array full of one object.
+    /// There is offcourse a limit on obstacles.
+    /// </summary>
+    /// <returns>Gives back a SpawnedObjectType multidimensional array full of one object.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayPlatform()
+    {
+        SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
+
+        SpawnedObjectType sot = GetRandomSpawnObjectType();
+        if (curLastItemPlatform <= itemPlatformDistance)
+        {
+            while (sot != SpawnedObjectType.Item) sot = GetRandomSpawnObjectType();
+        }
+
+        switch (sot)
+        {
+            case SpawnedObjectType.Item:
+                PlaceOneSpawnedObjectTypeRandomly(ref spawns, sot);
+                break;
+            case SpawnedObjectType.Coin:
+                FillSpawnedObjectTypeArray(ref spawns, sot);
+                break;
+            case SpawnedObjectType.None:
+                FillSpawnedObjectTypeArray(ref spawns, sot);
+                break;
+            case SpawnedObjectType.Obstacle:
+
+                break;
+        }
+
+        return spawns;
+    }
+
+    /// <summary>
+    /// Fills the given SpawnedObjectType array fully with one objectType.
+    /// </summary>
+    /// <param name="spawns">The SpawnedObjectType array you want to add objecttypes to.</param>
+    /// <param name="sot">The spawnedObjectType you want to fill the array with.</param>
+    private void FillSpawnedObjectTypeArray(ref SpawnedObjectType[,] spawns, SpawnedObjectType sot)
+    {
+        for(int x = 0; x < spawns.GetLength(0); x++)
+        {
+            for(int z=0; z < spawns.GetLength(1); z++)
+            {
+                spawns[x, z] = sot;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Places a item in a random place in the array.
+    /// </summary>
+    /// <param name="spawns">The spawn array</param>
+    /// <param name="sot">The spawnObjectType you want to place.</param>
+    private void PlaceOneSpawnedObjectTypeRandomly(ref SpawnedObjectType[,] spawns, SpawnedObjectType sot)
+    {
+        int xRandom = UnityEngine.Random.Range(0, (spawns.GetLength(0) - 1));
+        int zRandom = UnityEngine.Random.Range(0, (spawns.GetLength(1) - 1));
+        for (int z = 0; z < spawns.GetLength(1); z++)
+        {
+            for (int x = 0; x < spawns.GetLength(0); x++)
+            {
+                if (x == xRandom && z == zRandom)
+                {
+                    spawns[x, z] = sot;
+                }
+                else
+                {
+                    spawns[x, z] = SpawnedObjectType.None;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each x-axis.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each x-axis.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineX()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each z-axis.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each z-axis.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineZ()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array based on sections.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array based on sections.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayRandom()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array with randomObjects sorted line based on the x-axis.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array with randomObjects sorted line based on the x-axis.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayRandomLineX()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array with randomObjects sorted line based on the z-axis.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array with randomObjects sorted line based on the z-axis.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayRandomLineZ()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array with one object that isn't none.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array with one object that isn't none.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArraySingle()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Gives back a SpawnedObjectType multidimensional array based on sections.
+    /// </summary>
+    /// <returns>A SpawnedObjectType multidimensional array based on sections.</returns>
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArraySectioned()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Returns a spawnedObjectType based upon the spawnchance you have given.
+    /// It works the same as <see cref="GetSpawnObject(SpawnedObjectType)"/> to determine the value.
+    /// </summary>
+    /// <returns>A spawnedObjectType</returns>
+    private SpawnedObjectType GetRandomSpawnObjectType()
+    {
+        foreach (SpawnObjectTypeChance sotc in spawnObjectTypeChances)
+        {
+            float spawnFloat = UnityEngine.Random.Range(minSpawnObjectChance, maxSpawnObjectChance);
+            if (sotc.spawnChance < spawnFloat)
+            {
+                return sotc.spawnedObjectType;
+            }
+        }
+        return SpawnedObjectType.None;
     }
 
     /// <summary>
@@ -86,14 +271,14 @@ public class PlatformScript : MonoBehaviour {
     private SpawnObject GetSpawnObject(SpawnedObjectType objectType)
     {
         if (objectType == SpawnedObjectType.None) return SpawnObject.None;
-        foreach(SpawnObjectTypeChance sotc in spawnObjectTypeChances)
+        foreach (SpawnObjectTypeChance sotc in spawnObjectTypeChances)
         {
-            if(sotc.spawnedObjectType == objectType)
+            if (sotc.spawnedObjectType == objectType)
             {
                 float spawnFloat = UnityEngine.Random.Range(minSpawnObjectChance, maxSpawnObjectChance);
-                foreach(SpawnChance sc in sotc.spawnChances)
+                foreach (SpawnChance sc in sotc.spawnChances)
                 {
-                    if(sc.spawnChance < spawnFloat)
+                    if (sc.spawnChance < spawnFloat)
                     {
                         return sc.spawnObject;
                     }
@@ -150,7 +335,7 @@ public class PlatformScript : MonoBehaviour {
         Vector3 scale = new Vector3(x, y, z);
         Resize(scale);
     }
-    
+
     /// <summary>
     /// Resizes this object with the given scale.
     /// </summary>
