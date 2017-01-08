@@ -662,7 +662,7 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
-                    if (objectCount >= maxObjectCount)
+                    if (maxObjectCount != -1 && objectCount >= maxObjectCount) //Hier zit de fout die ik moet verbeteren indien het object 
                     {
                         SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
                         sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
