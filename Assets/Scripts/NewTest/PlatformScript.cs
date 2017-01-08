@@ -57,7 +57,7 @@ public class PlatformScript : MonoBehaviour
     public const float maxSpawnObjectChance = 100f;
     public const float minSpawnedObjectTypeChance = 0f;
     public const float maxSpawnedObjectTypeChance = 100f;
-    [Range(0,6)]
+    [Range(0, 6)]
     public int maxObstaclesPlatform = 2;
     [Range(0, 6)]
     public int minObstacleDistance = 2;
@@ -66,12 +66,15 @@ public class PlatformScript : MonoBehaviour
     public PlacementType placementType = PlacementType.X;
     [Range(2, 12)]
     public int itemPlatformDistance = 6;
-    private int curLastItemPlatform = 0;
+    private int curLastItemPlatform = 8;
+    [Range(2, 5)]
+    public int itemsGridWhenNotOne = 2;
     [Range(2, 7)]
     public int itemGridDistance = 2;
     public bool oneItemPlatform = true;
+    public bool ignoreMaxOnFill = true;
     public bool center = true; //Centers the object if possible (When the object next to it is non existent for example)
-    public bool placeNextToItem = true;
+    public bool placeNextToItemOrObstacle = true;
     public SpawnType spawnType;
     public SpawnObjectTypeChance[] spawnObjectTypeChances;
 
@@ -145,7 +148,14 @@ public class PlatformScript : MonoBehaviour
         switch (sot)
         {
             case SpawnedObjectType.Item:
-                PlaceOneSpawnedObjectTypeRandomly(ref spawns, sot); //nog voor meerdere items.
+                if (oneItemPlatform)
+                {
+                    PlaceOneSpawnedObjectTypeRandomly(ref spawns, sot);
+                }
+                else
+                {
+                    PlaceObjectsRandomly(ref spawns, sot, itemGridDistance, itemsGridWhenNotOne, itemAlignment, placementType);
+                }
                 break;
             case SpawnedObjectType.Coin:
                 FillSpawnedObjectTypeArray(ref spawns, sot);
@@ -154,7 +164,7 @@ public class PlatformScript : MonoBehaviour
                 FillSpawnedObjectTypeArray(ref spawns, sot);
                 break;
             case SpawnedObjectType.Obstacle:
-                PlaceObstaclesRandomly(ref spawns, SpawnedObjectType.Obstacle, minObstacleDistance, maxObstaclesPlatform, obstacleAlignment, placementType);
+                PlaceObjectsRandomly(ref spawns, sot, minObstacleDistance, maxObstaclesPlatform, obstacleAlignment, placementType);
                 break;
         }
 
@@ -227,7 +237,7 @@ public class PlatformScript : MonoBehaviour
     /// <param name="maxObjects">The maximum amount of objects you want to spawn.</param>
     /// <param name="alignment"></param>
     /// <param name="placementType">This will change the effect of the placement within the loop, based on grid axis</param>
-    private void PlaceObstaclesRandomly(ref SpawnedObjectType[,] spawns, SpawnedObjectType sot, int distance, int maxObjects, SpawnAlignment alignment = SpawnAlignment.None, PlacementType placementType = PlacementType.X)
+    private void PlaceObjectsRandomly(ref SpawnedObjectType[,] spawns, SpawnedObjectType sot, int distance, int maxObjects, SpawnAlignment alignment = SpawnAlignment.None, PlacementType placementType = PlacementType.X)
     {
         switch (placementType)
         {
@@ -245,7 +255,7 @@ public class PlatformScript : MonoBehaviour
     /// </summary>
     /// <param name="spawns">The array in which you want to have the spawnedObjectTypes. This method only fills the array up to 2 dimensions.</param>
     /// <param name="sot">The object you want to spawn randomly across the platform.</param>
-    /// <param name="distance">The minimum distance between objects.</param>
+    /// <param name="distance">The minimum grid distance between objects.</param>
     /// <param name="maximumObjects">The maximum amount of objects you want to spawn.</param>
     /// <param name="alignment"></param>
     private void PlaceObjectsRandomlyX(ref SpawnedObjectType[,] spawns, SpawnedObjectType sot, int distance, int maximumObjects, SpawnAlignment alignment = SpawnAlignment.None)
@@ -256,6 +266,7 @@ public class PlatformScript : MonoBehaviour
         int objectCount = 0;
         bool canSpawn = true;
         int maxObjects = maximumObjects;
+        int gridDistance = distance + 1;
 
         if (sot == SpawnedObjectType.Item && oneItemPlatform) maxObjects = 1;
 
@@ -272,29 +283,39 @@ public class PlatformScript : MonoBehaviour
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
                         {
                             zPos = GetZPos(alignment, spawns.GetLength(1), z); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om hier te gebruiken.
-                            xPos = GetRandomValue(0, spawns.GetLength(0), x, distance + 1); //GetXPos(alignment, spawns.GetLength(1), x + 1); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om te gebruiken.
+                            xPos = (zPos > z) ? GetRandomValue(0, spawns.GetLength(0), x, gridDistance) : GetXPos(alignment, spawns.GetLength(0), x + gridDistance); //GetXPos(alignment, spawns.GetLength(1), x + 1); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om te gebruiken.
                         }
                         if (zPos == -1 || xPos == -1) canSpawn = false;
                         break;
                     case SpawnAlignment.XAxis:
                         if (objectCount >= maxObjects) return;
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
-                            zPos = GetZPos(alignment, spawns.GetLength(1), z + distance + 1); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om hier te gebruiken.
+                            zPos = GetZPos(alignment, spawns.GetLength(1), z + gridDistance); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om hier te gebruiken.
                         if (zPos == -1)
                             canSpawn = false;
                         break;
                     case SpawnAlignment.XAxisFill:
-                        PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, xPos, z);
+                        if (ignoreMaxOnFill || objectCount < maxObjects)
+                        {
+                            PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, xPos, z);
+                            if (objectCount < maxObjects && z >= spawns.GetLength(1))
+                                xPos = GetXPos(alignment, spawns.GetLength(0), x + gridDistance);
+                        }
                         break;
                     case SpawnAlignment.ZAxis:
                         if (objectCount >= maxObjects) return;
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
-                            xPos = GetRandomValue(0, spawns.GetLength(0), x, distance + 1); //GetXPos(alignment, spawns.GetLength(1), x + 1); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om te gebruiken.
+                            xPos = GetRandomValue(0, spawns.GetLength(0), x, gridDistance); //GetXPos(alignment, spawns.GetLength(1), x + 1); //Je kan niks lager krijgen dan de huidige z dus de GetRandomValue methode is eigenlijk overbodig om te gebruiken.
                         if (xPos == -1)
                             canSpawn = false;
                         break;
                     case SpawnAlignment.ZAxisFill:
-                        PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, zPos);
+                        if (ignoreMaxOnFill || objectCount < maxObjects)
+                        {
+                            PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, zPos);
+                            if (objectCount < maxObjects && x >= spawns.GetLength(0))
+                                zPos = GetZPos(alignment, spawns.GetLength(1), z + gridDistance);
+                        }
                         break;
                 }
             }
@@ -317,6 +338,7 @@ public class PlatformScript : MonoBehaviour
         int objectCount = 0;
         bool canSpawn = true;
         int maxObjects = maximumObjects;
+        int gridDistance = distance + 1;
 
         if (sot == SpawnedObjectType.Item && oneItemPlatform) maxObjects = 1;
 
@@ -332,30 +354,40 @@ public class PlatformScript : MonoBehaviour
                         if (objectCount >= maxObjects) return;
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
                         {
-                            zPos = GetRandomValue(0, spawns.GetLength(0), z, distance + 1); //verschil met de andere method zit hier.
                             xPos = GetXPos(alignment, spawns.GetLength(0), x); //verschil met de andere method zit hier.
+                            zPos = (xPos > x) ? GetRandomValue(0, spawns.GetLength(0), z, gridDistance) : GetZPos(alignment, spawns.GetLength(1), z + gridDistance); //verschil met de andere method zit hier.
                         }
                         if (zPos == -1 || xPos == -1) canSpawn = false;
                         break;
                     case SpawnAlignment.XAxis:
                         if (objectCount >= maxObjects) return;
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
-                            zPos = GetRandomValue(0, spawns.GetLength(0), z, distance + 1); //verschil met de andere method zit hier.
+                            zPos = GetRandomValue(0, spawns.GetLength(0), z, gridDistance); //verschil met de andere method zit hier.
                         if (zPos == -1)
                             canSpawn = false;
                         break;
                     case SpawnAlignment.XAxisFill:
-                        PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, xPos, z);
+                        if (ignoreMaxOnFill || objectCount < maxObjects)
+                        {
+                            PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, xPos, z);
+                            if (objectCount < maxObjects && z >= spawns.GetLength(1))
+                                xPos = GetXPos(alignment, spawns.GetLength(0), x + gridDistance);
+                        }
                         break;
                     case SpawnAlignment.ZAxis:
                         if (objectCount >= maxObjects) return;
                         if (PlaceOnRightAlignment(ref spawns, ref objectCount, sot, x, xPos, z, zPos))
-                            xPos = GetXPos(alignment, spawns.GetLength(0), x + distance + 1); //verschil met de andere method zit hier.
+                            xPos = GetXPos(alignment, spawns.GetLength(0), x + gridDistance); //verschil met de andere method zit hier.
                         if (xPos == -1)
                             canSpawn = false;
                         break;
                     case SpawnAlignment.ZAxisFill:
-                        PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, zPos);
+                        if (ignoreMaxOnFill || objectCount < maxObjects)
+                        {
+                            PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, zPos);
+                            if (objectCount < maxObjects && x >= spawns.GetLength(0))
+                                zPos = GetZPos(alignment, spawns.GetLength(1), z + gridDistance);
+                        }
                         break;
                 }
             }
@@ -587,7 +619,116 @@ public class PlatformScript : MonoBehaviour
     /// <returns>A SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each x-axis.</returns>
     private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineX()
     {
-        return null;
+        SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
+
+        bool maxItems = false;
+        bool maxObstacles = false;
+
+        int objectCount = 0;
+
+        for (int x = 0; x < spawns.GetLength(0); x++)
+        {
+            SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+
+            int maxObjectCount = GetMaxObjectCount(sot);
+
+            for (int z = 0; z < spawns.GetLength(1); z++)
+            {
+                if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
+                {
+                    PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
+                    if(objectCount >= maxObjectCount)
+                    {
+                        SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                        sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                        maxObjectCount = GetMaxObjectCount(sot);
+                    }
+                }
+            }
+        }
+
+        return spawns;
+    }
+
+    /// <summary>
+    /// Sets the MaxItems of MaxObstacles boolean too true if the sot is a item or obstacle.
+    /// </summary>
+    /// <param name="sot">The spawnedObjectType</param>
+    /// <param name="maxItems">The maxItems boolean.</param>
+    /// <param name="maxObstacles">The maxObstacles boolean.</param>
+    private void SetMaxSpawnTypeBoolToTrue(SpawnedObjectType sot, ref bool maxItems, ref bool maxObstacles)
+    {
+        switch (sot)
+        {
+            case SpawnedObjectType.Item:
+                maxItems = true;
+                break;
+            case SpawnedObjectType.Obstacle:
+                maxObstacles = true;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Gets a random SpawnedObjectType based on a maxitems and maxobstacles boolean.
+    /// </summary>
+    /// <param name="maxItems">If the amount of items has reached max.</param>
+    /// <param name="maxObstacles">If the amount of obstacles has reached max.</param>
+    /// <param name="checkLastItemPlatform">If it needs to check for item platform distances.</param>
+    /// <returns></returns>
+    private SpawnedObjectType GetRandomSpawnObjectType(bool maxItems, bool maxObstacles, bool checkLastItemPlatform = true)
+    {
+        bool found = false;
+        while (!found)
+        {
+            SpawnedObjectType sot = GetRandomSpawnObjectType();
+            switch (sot)
+            {
+                case SpawnedObjectType.Item:
+                    if (!maxItems)
+                    {
+                        if (!checkLastItemPlatform)
+                        {
+
+                        }
+                        else if (checkLastItemPlatform && (curLastItemPlatform > itemPlatformDistance))
+                        {
+                            return sot;
+                        }
+
+                    }
+                    break;
+                case SpawnedObjectType.Obstacle:
+                    if (!maxObstacles)
+                    {
+                        return sot;
+                    }
+                    break;
+                case SpawnedObjectType.Coin:
+                    return sot;
+                case SpawnedObjectType.None:
+                    return sot;
+            }
+        }
+        return SpawnedObjectType.None;
+    }
+
+    /// <summary>
+    /// Gets the maxObjectcount of the given object.
+    /// </summary>
+    /// <param name="sot">The spawneObjectType you want the maxCountFor</param>
+    /// <returns>The maximum amount of objects allowed on the platform for the given objecttype.</returns>
+    private int GetMaxObjectCount(SpawnedObjectType sot)
+    {
+        switch (sot)
+        {
+            case SpawnedObjectType.Item:
+                return itemsGridWhenNotOne;
+            case SpawnedObjectType.Obstacle:
+                return maxObstaclesPlatform;
+            default:
+                return -1;
+        }
     }
 
     /// <summary>
@@ -596,7 +737,35 @@ public class PlatformScript : MonoBehaviour
     /// <returns>A SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each z-axis.</returns>
     private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineZ()
     {
-        return null;
+        SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
+
+        bool maxItems = false;
+        bool maxObstacles = false;
+
+        int objectCount = 0;
+
+        for (int z = 0; z < spawns.GetLength(0); z++)
+        {
+            SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+
+            int maxObjectCount = GetMaxObjectCount(sot);
+
+            for (int x = 0; x < spawns.GetLength(1); x++)
+            {
+                if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
+                {
+                    PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, z);
+                    if (objectCount >= maxObjectCount)
+                    {
+                        SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                        sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                        maxObjectCount = GetMaxObjectCount(sot);
+                    }
+                }
+            }
+        }
+
+        return spawns;
     }
 
     /// <summary>
