@@ -476,7 +476,32 @@ public class PlatformScript : MonoBehaviour
         {
             return -1;
         }
+    }
 
+
+    /// <summary>
+    /// Gets a randomValue between the min and the max which is not in the excluded set.
+    /// </summary>
+    /// <param name="min">The minimum value of the array you want.</param>
+    /// <param name="max">The maximum value of the array you want.</param>
+    /// <param name="excluded">The excluded numbers.</param>
+    /// <returns>A randomValue between the min and the max which is not in the excluded set.</returns>
+    private int GetRandomValue(int min, int max, HashSet<int> excluded)
+    {
+        int[] numberArray = new int[(max - excluded.Count)];
+        int curExcluded = 0;
+        for (int i = 0; i < max; i++)
+        {
+            if (excluded.Contains(i))
+            {
+                curExcluded++;
+            }
+            else
+            {
+                numberArray[i - curExcluded] = i;
+            }
+        }
+        return numberArray[UnityEngine.Random.Range(0, numberArray.Length)];
     }
 
 
@@ -683,44 +708,29 @@ public class PlatformScript : MonoBehaviour
         int itemID = (int)SpawnedObjectType.Item;
         int obstacleID = (int)SpawnedObjectType.Obstacle;
 
+        HashSet<int> excluded = new HashSet<int>();
         if (!maxItems && !maxObstacles)
         {
-            if (checkLastItemPlatform)
+            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
             {
-                if (curLastItemPlatform > itemPlatformDistance)
-                {
-                    return (SpawnedObjectType)UnityEngine.Random.Range(0, maxAmount);
-                }
-                else
-                {
-                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, itemID, 0);
-                }
-            }
-            else
-            {
-                return (SpawnedObjectType)UnityEngine.Random.Range(0, maxAmount);
+                excluded.Add(itemID);
             }
         }
         else if (!maxItems && maxObstacles)
         {
-            if (checkLastItemPlatform)
+            excluded.Add(obstacleID);
+            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
             {
-                if (curLastItemPlatform > itemPlatformDistance)
-                {
-                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, obstacleID, 0);
-                }
-                else
-                {
-                    int distance = obstacleID -
-                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, itemID, 0);
-                }
-            }
-            else
-            {
-                return (SpawnedObjectType)GetRandomValue(0, maxAmount, obstacleID, 0);
+                excluded.Add(itemID);
             }
         }
+        else if (maxItems && !maxObstacles)
+        {
+            excluded.Add(itemID);
+        }
 
+        return (SpawnedObjectType)GetRandomValue(0, maxAmount, excluded);
+        /*
         bool found = false;
         while (!found)
         {
@@ -753,7 +763,7 @@ public class PlatformScript : MonoBehaviour
                     return sot;
             }
         }
-        return SpawnedObjectType.None;
+        return SpawnedObjectType.None;*/
     }
 
     /// <summary>
