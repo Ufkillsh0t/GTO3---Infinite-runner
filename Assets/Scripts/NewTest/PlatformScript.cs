@@ -637,7 +637,7 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
-                    if(objectCount >= maxObjectCount)
+                    if (objectCount >= maxObjectCount)
                     {
                         SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
                         sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
@@ -677,7 +677,50 @@ public class PlatformScript : MonoBehaviour
     /// <param name="checkLastItemPlatform">If it needs to check for item platform distances.</param>
     /// <returns></returns>
     private SpawnedObjectType GetRandomSpawnObjectType(bool maxItems, bool maxObstacles, bool checkLastItemPlatform = true)
-    {
+    { //Der uit met dezen handel;
+        int maxAmount = Enum.GetNames(typeof(SpawnedObjectType)).Length;
+
+        int itemID = (int)SpawnedObjectType.Item;
+        int obstacleID = (int)SpawnedObjectType.Obstacle;
+
+        if (!maxItems && !maxObstacles)
+        {
+            if (checkLastItemPlatform)
+            {
+                if (curLastItemPlatform > itemPlatformDistance)
+                {
+                    return (SpawnedObjectType)UnityEngine.Random.Range(0, maxAmount);
+                }
+                else
+                {
+                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, itemID, 0);
+                }
+            }
+            else
+            {
+                return (SpawnedObjectType)UnityEngine.Random.Range(0, maxAmount);
+            }
+        }
+        else if (!maxItems && maxObstacles)
+        {
+            if (checkLastItemPlatform)
+            {
+                if (curLastItemPlatform > itemPlatformDistance)
+                {
+                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, obstacleID, 0);
+                }
+                else
+                {
+                    int distance = obstacleID -
+                    return (SpawnedObjectType)GetRandomValue(0, maxAmount, itemID, 0);
+                }
+            }
+            else
+            {
+                return (SpawnedObjectType)GetRandomValue(0, maxAmount, obstacleID, 0);
+            }
+        }
+
         bool found = false;
         while (!found)
         {
