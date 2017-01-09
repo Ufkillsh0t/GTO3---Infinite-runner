@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PlatformScript : MonoBehaviour
 {
+    //TODO: Later misschien deze klasse zonder ref maken en kijken naar performance verschillen, of vragen aan leraar wat het beste is.
 
     public enum SpawnType
     {
@@ -642,18 +643,20 @@ public class PlatformScript : MonoBehaviour
     /// Gives back a SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each x-axis.
     /// </summary>
     /// <returns>A SpawnedObjectType multidimensional array with one single object or multiple objects of the same type on each x-axis.</returns>
-    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineX()
+    private SpawnedObjectType[,] GenerateSpawnObjectTypesArrayLineX() //Perhaps: fill niet ignoren op deze 
     {
         SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
 
         bool maxItems = false;
         bool maxObstacles = false;
 
-
+        int objectCount = 0;
+        int itemCount = 0;
+        int obstacleCount = 0;
         for (int x = 0; x < spawns.GetLength(0); x++)
         {
+            objectCount = 0;
             SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-            int objectCount = 0;
             int maxObjectCount = GetMaxObjectCount(sot);
 
             for (int z = 0; z < spawns.GetLength(1); z++)
@@ -661,13 +664,33 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
-                    if ((sot != SpawnedObjectType.Coin && sot != SpawnedObjectType.None && objectCount >= maxObjectCount)
-                        || (sot == SpawnedObjectType.Item && oneItemPlatform))
+                    if (sot == SpawnedObjectType.Item)
                     {
-                        SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
-                        sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-                        maxObjectCount = GetMaxObjectCount(sot);
-                        objectCount = 0;
+                        itemCount++;
+                        if ((itemCount >= maxObjectCount || oneItemPlatform))
+                        {
+                            SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                            if (!ignoreMaxOnFill || oneItemPlatform)
+                            {
+                                sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                                maxObjectCount = GetMaxObjectCount(sot);
+                                objectCount = 0;
+                            }
+                        }
+                    }
+                    else if (sot == SpawnedObjectType.Obstacle)
+                    {
+                        obstacleCount++;
+                        if (obstacleCount >= maxObjectCount)
+                        {
+                            SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                            if (!ignoreMaxOnFill)
+                            {
+                                sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                                maxObjectCount = GetMaxObjectCount(sot);
+                                objectCount = 0;
+                            }
+                        }
                     }
                 }
             }
