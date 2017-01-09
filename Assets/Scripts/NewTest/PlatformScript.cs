@@ -139,7 +139,7 @@ public class PlatformScript : MonoBehaviour
     {
         SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
 
-        SpawnedObjectType sot = GetRandomSpawnObjectType();
+        SpawnedObjectType sot = GetRandomSpawnObjectType(); //optimaliseren met verbeterde line code.
         if (curLastItemPlatform <= itemPlatformDistance)
         {
             while (sot == SpawnedObjectType.Item) sot = GetRandomSpawnObjectType();
@@ -649,12 +649,11 @@ public class PlatformScript : MonoBehaviour
         bool maxItems = false;
         bool maxObstacles = false;
 
-        int objectCount = 0;
 
         for (int x = 0; x < spawns.GetLength(0); x++)
         {
             SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-
+            int objectCount = 0;
             int maxObjectCount = GetMaxObjectCount(sot);
 
             for (int z = 0; z < spawns.GetLength(1); z++)
@@ -662,11 +661,13 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
-                    if (maxObjectCount != -1 && objectCount >= maxObjectCount) //Hier zit de fout die ik moet verbeteren indien het object 
+                    if ((sot != SpawnedObjectType.Coin && sot != SpawnedObjectType.None && objectCount >= maxObjectCount)
+                        || (sot == SpawnedObjectType.Item && oneItemPlatform))
                     {
                         SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
                         sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
                         maxObjectCount = GetMaxObjectCount(sot);
+                        objectCount = 0;
                     }
                 }
             }
@@ -728,42 +729,13 @@ public class PlatformScript : MonoBehaviour
         {
             excluded.Add(itemID);
         }
+        else
+        {
+            excluded.Add(itemID);
+            excluded.Add(obstacleID);
+        }
 
         return (SpawnedObjectType)GetRandomValue(0, maxAmount, excluded);
-        /*
-        bool found = false;
-        while (!found)
-        {
-            SpawnedObjectType sot = GetRandomSpawnObjectType();
-            switch (sot)
-            {
-                case SpawnedObjectType.Item:
-                    if (!maxItems)
-                    {
-                        if (!checkLastItemPlatform)
-                        {
-
-                        }
-                        else if (checkLastItemPlatform && (curLastItemPlatform > itemPlatformDistance))
-                        {
-                            return sot;
-                        }
-
-                    }
-                    break;
-                case SpawnedObjectType.Obstacle:
-                    if (!maxObstacles)
-                    {
-                        return sot;
-                    }
-                    break;
-                case SpawnedObjectType.Coin:
-                    return sot;
-                case SpawnedObjectType.None:
-                    return sot;
-            }
-        }
-        return SpawnedObjectType.None;*/
     }
 
     /// <summary>
@@ -795,24 +767,24 @@ public class PlatformScript : MonoBehaviour
         bool maxItems = false;
         bool maxObstacles = false;
 
-        int objectCount = 0;
-
-        for (int z = 0; z < spawns.GetLength(0); z++)
+        for (int z = 0; z < spawns.GetLength(1); z++)
         {
             SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-
+            int objectCount = 0;
             int maxObjectCount = GetMaxObjectCount(sot);
 
-            for (int x = 0; x < spawns.GetLength(1); x++)
+            for (int x = 0; x < spawns.GetLength(0); x++)
             {
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, z);
-                    if (objectCount >= maxObjectCount)
+                    if ((sot != SpawnedObjectType.Coin && sot != SpawnedObjectType.None && objectCount >= maxObjectCount)
+                        || (sot == SpawnedObjectType.Item && oneItemPlatform))
                     {
                         SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
                         sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
                         maxObjectCount = GetMaxObjectCount(sot);
+                        objectCount = 0;
                     }
                 }
             }
