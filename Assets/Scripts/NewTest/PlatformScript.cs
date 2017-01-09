@@ -664,39 +664,54 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
-                    if (sot == SpawnedObjectType.Item)
-                    {
-                        itemCount++;
-                        if ((itemCount >= maxObjectCount || oneItemPlatform))
-                        {
-                            SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
-                            if (!ignoreMaxOnFill || oneItemPlatform)
-                            {
-                                sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-                                maxObjectCount = GetMaxObjectCount(sot);
-                                objectCount = 0;
-                            }
-                        }
-                    }
-                    else if (sot == SpawnedObjectType.Obstacle)
-                    {
-                        obstacleCount++;
-                        if (obstacleCount >= maxObjectCount)
-                        {
-                            SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
-                            if (!ignoreMaxOnFill)
-                            {
-                                sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-                                maxObjectCount = GetMaxObjectCount(sot);
-                                objectCount = 0;
-                            }
-                        }
-                    }
+                    CheckIfItMaySpawn(ref sot, ref itemCount, ref obstacleCount, ref objectCount, ref maxObjectCount, ref maxItems, ref maxObstacles);
                 }
             }
         }
 
         return spawns;
+    }
+
+    /// <summary>
+    /// Checks wether a item or obstacle may spawn next.
+    /// </summary>
+    /// <param name="sot">The object you want to spawn.</param>
+    /// <param name="itemCount">the current amount of items.</param>
+    /// <param name="obstacleCount">the current amount of obstacles.</param>
+    /// <param name="objectCount">the current amount of objects.</param>
+    /// <param name="maxObjectCount">the maximum of objects allowed.</param>
+    /// <param name="maxItems">the maximum of items allowed.</param>
+    /// <param name="maxObstacles">the maximum of obstacles allowed.</param>
+    private void CheckIfItMaySpawn(ref SpawnedObjectType sot, ref int itemCount, ref int obstacleCount, ref int objectCount, ref int maxObjectCount, ref bool maxItems, ref bool maxObstacles)
+    {
+        if (sot == SpawnedObjectType.Item)
+        {
+            itemCount++;
+            if ((itemCount >= maxObjectCount || oneItemPlatform))
+            {
+                SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                if (!ignoreMaxOnFill || oneItemPlatform)
+                {
+                    sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                    maxObjectCount = GetMaxObjectCount(sot);
+                    objectCount = 0;
+                }
+            }
+        }
+        else if (sot == SpawnedObjectType.Obstacle)
+        {
+            obstacleCount++;
+            if (obstacleCount >= maxObjectCount)
+            {
+                SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
+                if (!ignoreMaxOnFill)
+                {
+                    sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
+                    maxObjectCount = GetMaxObjectCount(sot);
+                    objectCount = 0;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -747,10 +762,13 @@ public class PlatformScript : MonoBehaviour
         bool maxItems = false;
         bool maxObstacles = false;
 
+        int objectCount = 0;
+        int itemCount = 0;
+        int obstacleCount = 0;
         for (int z = 0; z < spawns.GetLength(1); z++)
         {
+            objectCount = 0;
             SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-            int objectCount = 0;
             int maxObjectCount = GetMaxObjectCount(sot);
 
             for (int x = 0; x < spawns.GetLength(0); x++)
@@ -758,14 +776,7 @@ public class PlatformScript : MonoBehaviour
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, z, z);
-                    if ((sot != SpawnedObjectType.Coin && sot != SpawnedObjectType.None && objectCount >= maxObjectCount)
-                        || (sot == SpawnedObjectType.Item && oneItemPlatform))
-                    {
-                        SetMaxSpawnTypeBoolToTrue(sot, ref maxItems, ref maxObstacles);
-                        sot = GetRandomSpawnObjectType(maxItems, maxObstacles);
-                        maxObjectCount = GetMaxObjectCount(sot);
-                        objectCount = 0;
-                    }
+                    CheckIfItMaySpawn(ref sot, ref itemCount, ref obstacleCount, ref objectCount, ref maxObjectCount, ref maxItems, ref maxObstacles);
                 }
             }
         }
