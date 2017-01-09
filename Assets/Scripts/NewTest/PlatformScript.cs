@@ -18,7 +18,7 @@ public class PlatformScript : MonoBehaviour
         Single,
         Sectioned
     }
-
+    
     public enum SpawnAlignment
     {
         ZAxis,
@@ -855,7 +855,11 @@ public class PlatformScript : MonoBehaviour
     /// <returns>A SpawnedObjectType multidimensional array with one object that isn't none.</returns>
     private SpawnedObjectType[,] GenerateSpawnObjectTypesArraySingle()
     {
-        return null;
+        SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
+
+        PlaceOneSpawnedObjectTypeRandomly(ref spawns, GetRandomSpawnObjectType());
+
+        return spawns;
     }
 
     /// <summary>
