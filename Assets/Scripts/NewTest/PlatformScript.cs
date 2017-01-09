@@ -696,49 +696,6 @@ public class PlatformScript : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets a random SpawnedObjectType based on a maxitems and maxobstacles boolean.
-    /// </summary>
-    /// <param name="maxItems">If the amount of items has reached max.</param>
-    /// <param name="maxObstacles">If the amount of obstacles has reached max.</param>
-    /// <param name="checkLastItemPlatform">If it needs to check for item platform distances.</param>
-    /// <returns></returns>
-    private SpawnedObjectType GetRandomSpawnObjectType(bool maxItems, bool maxObstacles, bool checkLastItemPlatform = true)
-    { //Der uit met dezen handel;
-        int maxAmount = Enum.GetNames(typeof(SpawnedObjectType)).Length;
-
-        int itemID = (int)SpawnedObjectType.Item;
-        int obstacleID = (int)SpawnedObjectType.Obstacle;
-
-        HashSet<int> excluded = new HashSet<int>();
-        if (!maxItems && !maxObstacles)
-        {
-            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
-            {
-                excluded.Add(itemID);
-            }
-        }
-        else if (!maxItems && maxObstacles)
-        {
-            excluded.Add(obstacleID);
-            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
-            {
-                excluded.Add(itemID);
-            }
-        }
-        else if (maxItems && !maxObstacles)
-        {
-            excluded.Add(itemID);
-        }
-        else
-        {
-            excluded.Add(itemID);
-            excluded.Add(obstacleID);
-        }
-
-        return (SpawnedObjectType)GetRandomValue(0, maxAmount, excluded);
-    }
-
-    /// <summary>
     /// Gets the maxObjectcount of the given object.
     /// </summary>
     /// <param name="sot">The spawneObjectType you want the maxCountFor</param>
@@ -854,6 +811,54 @@ public class PlatformScript : MonoBehaviour
             }
         }
         return SpawnedObjectType.None;
+    }
+
+    /// <summary>
+    /// Gets a random SpawnedObjectType based on a maxitems and maxobstacles boolean.
+    /// </summary>
+    /// <param name="maxItems">If the amount of items has reached max.</param>
+    /// <param name="maxObstacles">If the amount of obstacles has reached max.</param>
+    /// <param name="checkLastItemPlatform">If it needs to check for item platform distances.</param>
+    /// <returns></returns>
+    private SpawnedObjectType GetRandomSpawnObjectType(bool maxItems, bool maxObstacles, bool checkLastItemPlatform = true)
+    { //Der uit met dezen handel;
+        int maxAmount = Enum.GetNames(typeof(SpawnedObjectType)).Length;
+
+        int itemID = (int)SpawnedObjectType.Item;
+        int obstacleID = (int)SpawnedObjectType.Obstacle;
+
+        HashSet<int> excluded = new HashSet<int>();
+        if (!maxItems && !maxObstacles)
+        {
+            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
+            {
+                excluded.Add(itemID);
+            }
+        }
+        else if (!maxItems && maxObstacles)
+        {
+            excluded.Add(obstacleID);
+            if (checkLastItemPlatform && curLastItemPlatform <= itemPlatformDistance)
+            {
+                excluded.Add(itemID);
+            }
+        }
+        else if (maxItems && !maxObstacles)
+        {
+            excluded.Add(itemID);
+        }
+        else
+        {
+            excluded.Add(itemID);
+            excluded.Add(obstacleID);
+        }
+
+        SpawnedObjectType sot = GetRandomSpawnObjectType();
+        if (excluded.Contains((int)sot))
+        {
+            return SpawnedObjectType.None;
+        }
+        return sot; //GetRandomValue(0, maxAmount, excluded)
     }
 
     /// <summary>
