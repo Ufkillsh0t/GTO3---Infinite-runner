@@ -53,7 +53,7 @@ public class PlatformScript : MonoBehaviour
 
     public SpawnableObject[,] platformObjects;
     public Vector3 gridSize = Vector3.one;
-    public Vector3 sectionSize = new Vector3(2, 0, 1);
+    public Vector2 sectionSize = new Vector2(2, 1);
     public const float minSpawnObjectChance = 0f;
     public const float maxSpawnObjectChance = 100f;
     public const float minSpawnedObjectTypeChance = 0f;
@@ -781,7 +781,6 @@ public class PlatformScript : MonoBehaviour
 
             for (z = 0; z < spawns.GetLength(1); z++)
             {
-
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, z);
@@ -827,8 +826,7 @@ public class PlatformScript : MonoBehaviour
             objectCount = 0;
 
             for (x = 0; x < spawns.GetLength(0); x++)
-            {
-
+            {        
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, x, z);
@@ -868,7 +866,62 @@ public class PlatformScript : MonoBehaviour
     /// <returns>A SpawnedObjectType multidimensional array based on sections.</returns>
     private SpawnedObjectType[,] GenerateSpawnObjectTypesArraySectioned()
     {
-        return null;
+        SpawnedObjectType[,] spawns = new SpawnedObjectType[platformObjects.GetLength(0), platformObjects.GetLength(1)];
+
+        int secX = (int)sectionSize.x;
+        int secY = (int)sectionSize.y;
+        int xSize = spawns.GetLength(0) % secX;
+        int ySize = spawns.GetLength(1) % secY;
+
+        bool maxItems = false;
+        bool maxObstacles = false;
+
+        Vector2 lastItemPos = Vector2.down;
+        Vector2 lastObstaclePos = Vector2.down;
+
+        int objectCount = 0;
+        int itemCount = 0;
+        int obstacleCount = 0;
+
+        for (int xSec = 0; xSec < xSize; xSec++)
+        {
+            for(int ySec = 0; ySec < ySize; ySec++)
+            {
+                SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles, xSec, ySec, lastItemPos, lastObstaclePos, checkItemPlatformDistance, defaultAlignment);
+                int maxObjectCount = GetMaxObjectCount(sot);
+                objectCount = 0;
+
+                int curXSize = (xSec + 1) * xSize;
+                int curYSize = (ySec + 1) * ySize;
+                int secXLength = ((spawns.GetLength(0) - curXSize) <= 0) ? curXSize + xSize : spawns.GetLength(0);
+                int secYLength = ((spawns.GetLength(1) - curYSize) <= 0) ? curYSize + ySize : spawns.GetLength(1);
+                curXSize -= xSize;
+                curYSize -= ySize;
+                for (int x = curXSize; x < secXLength; x++)
+                {
+                    for(int y = curYSize; y < secYLength; y++)
+                    {
+                        if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
+                        {
+                            PlaceOnRightAlignmentX(ref spawns, ref objectCount, sot, x, x, y);
+                            switch (sot)
+                            {
+                                case SpawnedObjectType.Item:
+                                    lastItemPos = new Vector2(x, y);
+                                    break;
+                                case SpawnedObjectType.Obstacle:
+                                    lastObstaclePos = new Vector2(x, y);
+                                    break;
+                            }
+                            CheckIfItMaySpawn(ref sot, ref itemCount, ref obstacleCount, ref objectCount, ref maxObjectCount, ref maxItems, ref maxObstacles, ignoreMaxOnFill);
+                        }
+                    }
+                }
+                
+            }
+        }
+
+        return spawns;
     }
 
     /// <summary>
