@@ -3,31 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SpawnedObjectType
-{
-    None,
-    Coin,
-    Item,
-    Obstacle
-}
-
-public enum SpawnObject
-{
-    None,
-    SmallCoin,
-    MediumCoin,
-    BigCoin,
-    Magnet,
-    SpeedBoost,
-    SlowDown,
-    PlatformIncrease,
-    PlatformDecrease,
-    Spike,
-    Box,
-    Mud,
-    HoveringBox
-}
-
 public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>
 {
     public Vector3 resetPosition = Vector3.zero;
