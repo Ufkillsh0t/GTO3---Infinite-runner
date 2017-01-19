@@ -33,19 +33,19 @@ public enum SpawnType
 {
     Platform,
     LineX,
-    LineZ,
+    LineY,
     Random,
     RandomLineX,
-    RandomLineZ,
+    RandomLineY,
     Single,
     Sectioned
 }
 
 public enum SpawnAlignment
 {
-    ZAxis,
+    YAxis,
     XAxis,
-    ZAxisFill, //Ignores the maximum and fills the entire row.
+    YAxisFill, //Ignores the maximum and fills the entire row.
     XAxisFill, //Ignores the maximum and fills the entire row.
     None
 }
@@ -53,5 +53,5 @@ public enum SpawnAlignment
 public enum PlacementType
 {
     X,
-    Z
+    Y
 }
