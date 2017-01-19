@@ -18,7 +18,7 @@ public class PlatformScript : MonoBehaviour
         Single,
         Sectioned
     }
-    
+
     public enum SpawnAlignment
     {
         ZAxis,
@@ -826,7 +826,7 @@ public class PlatformScript : MonoBehaviour
             objectCount = 0;
 
             for (x = 0; x < spawns.GetLength(0); x++)
-            {        
+            {
                 if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                 {
                     PlaceOnRightAlignmentZ(ref spawns, ref objectCount, sot, x, x, z);
@@ -870,8 +870,8 @@ public class PlatformScript : MonoBehaviour
 
         int secX = (int)sectionSize.x;
         int secY = (int)sectionSize.y;
-        int xSize = spawns.GetLength(0) % secX;
-        int ySize = spawns.GetLength(1) % secY;
+        int xSize = Mathf.CeilToInt((float)spawns.GetLength(0) / secX);
+        int ySize = Mathf.CeilToInt((float)spawns.GetLength(1) / secY);
 
         bool maxItems = false;
         bool maxObstacles = false;
@@ -885,21 +885,26 @@ public class PlatformScript : MonoBehaviour
 
         for (int xSec = 0; xSec < xSize; xSec++)
         {
-            for(int ySec = 0; ySec < ySize; ySec++)
+            for (int ySec = 0; ySec < ySize; ySec++)
             {
                 SpawnedObjectType sot = GetRandomSpawnObjectType(maxItems, maxObstacles, xSec, ySec, lastItemPos, lastObstaclePos, checkItemPlatformDistance, defaultAlignment);
                 int maxObjectCount = GetMaxObjectCount(sot);
                 objectCount = 0;
+                
+                int secXStart = (xSec != 0) ? (xSec * secX) : 0;
+                int secYStart = (ySec != 0) ? (ySec * secY) : 0;
+                int secXLength = (secXStart < spawns.GetLength(0)) ? 
+                    (((secXStart + secX) < spawns.GetLength(0)) ? secXStart + secX : spawns.GetLength(0)) 
+                    : secXStart;
+                int secYLength = (secYStart < spawns.GetLength(1)) ? 
+                    (((secYStart + secY) < spawns.GetLength(1)) ? secYStart + secY : spawns.GetLength(1)) 
+                    : secYStart;
 
-                int curXSize = (xSec + 1) * xSize;
-                int curYSize = (ySec + 1) * ySize;
-                int secXLength = ((spawns.GetLength(0) - curXSize) <= 0) ? curXSize + xSize : spawns.GetLength(0);
-                int secYLength = ((spawns.GetLength(1) - curYSize) <= 0) ? curYSize + ySize : spawns.GetLength(1);
-                curXSize -= xSize;
-                curYSize -= ySize;
-                for (int x = curXSize; x < secXLength; x++)
+                Debug.Log("LUL");
+
+                for (int x = secXStart; x < secXLength; x++)
                 {
-                    for(int y = curYSize; y < secYLength; y++)
+                    for (int y = secYStart; y < secYLength; y++)
                     {
                         if (ignoreMaxOnFill || objectCount < maxObjectCount || maxObjectCount == -1)
                         {
@@ -917,7 +922,7 @@ public class PlatformScript : MonoBehaviour
                         }
                     }
                 }
-                
+
             }
         }
 
