@@ -15,7 +15,7 @@ public class PickupableObject : SpawnableObject {
     public float startRotateSpeed = 2f;
     public float maxRotateSpeed = 30f;
     public float rotateSpeedIncreasePerSecond = 20f;
-    private bool smoothPickup = true;
+    private bool smoothPickup = false;
     private float curPickupSpeed;
     private float curRotateSpeed;
 
@@ -29,6 +29,7 @@ public class PickupableObject : SpawnableObject {
     protected void Start()
     {
         base.Start();
+        player = PlayerScript.Instance;
     }
 
     // Update is called once per frame
@@ -73,7 +74,7 @@ public class PickupableObject : SpawnableObject {
         }
         float step = curPickupSpeed * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, player.transform.position, step);
-        if (Vector3.Distance(transform.position, player.transform.position) < pickupRange)
+        if (Vector3.Distance(transform.position, base.player.transform.position) < pickupRange)
         {
             PickUp();
         }

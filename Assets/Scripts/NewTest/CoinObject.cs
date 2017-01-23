@@ -19,7 +19,10 @@ public class CoinObject : PickupableObject
 
     private void OnTriggerEnter(Collider other)
     {
-        PickUp();
+        if (other.gameObject.layer == 8)
+        {
+            PickUp();
+        }
     }
 
     public override void PickUp()

@@ -79,14 +79,16 @@ public class PlatformScript : MonoBehaviour
     /// <param name="y">the y grid</param>
     public void SpawnObject(SpawnableObject spawnableObject, int x, int y)
     {
-        float spawnDifx = transform.localPosition.x + (transform.localScale.x / 2);
-        float spawnDifz = transform.localPosition.z + (transform.localScale.z / 2);
+        float spawnDifx = transform.localPosition.x + (spawnableObject.transform.localScale.x);
+        float spawnDifz = transform.localPosition.z + (spawnableObject.transform.localScale.z);
 
         float spawnPointX = spawnDifx + x;
         float spawnPointY = transform.localPosition.x + transform.localScale.y;
         float spawnPointZ = spawnDifz + y;
 
         spawnableObject.transform.position = new Vector3(spawnPointX, spawnPointY, spawnPointZ);
+        spawnableObject.used = false;
+        spawnableObject.Show();
     }
 
     /// <summary>

@@ -26,7 +26,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public class CoinSpawn
     {
         private SpawnedObjectType spawnedObjectType = SpawnedObjectType.Coin;
-        public CoinObject coinObject;
+        public GameObject coinObject;
         [Range(minSpawnObjectChance, maxSpawnObjectChance)]
         public float spawnObjectChance;
     }
@@ -38,14 +38,20 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public float platformRecycleOffset;
     public int numberOfFloors = 3;
     public Floor[] platformQueues;
+    public int amountOfCoins = 70;
     public CoinSpawn[] coinSpawns;
     private PlayerScript player;
     private bool first = true;
+
+    private TCollection<CoinObject> tCoin;
+    private TCollection<ItemObject> tItem;
+    private TCollection<ObstacleObject> tObstacle;
 
     // Use this for initialization
     void Start()
     {
         player = PlayerScript.Instance;
+        InstantiateCoins();
         InstantiatePlatforms();
     }
 
@@ -81,6 +87,30 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
     }
 
+    private void InstantiateCoins()
+    {
+        if (coinSpawns.Length > 0)
+        {
+            tCoin = new TCollection<CoinObject>(amountOfCoins);
+            for (int i = 0; i < amountOfCoins; i++)
+            {
+                GameObject co = InstantiateRandomCoinObject();
+                if (co != null)
+                {
+                    tCoin.Enqueue(Instantiate(co).GetComponent<CoinObject>());
+                }
+                else
+                {
+                    Debug.LogError("Coinobject is null!");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Atleast one coin object is needed!");
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -95,52 +125,35 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
 
     private void Recycle(Floor floor)
     {
-        Vector3 scale;
-        if (floor.platformStartPosition == floor.platformNextPosition)
-        {
-            scale = new Vector3(
-                12,
-                UnityEngine.Random.Range(floor.platformMinSize.y, floor.platformMaxSize.y),
-                UnityEngine.Random.Range(floor.platformMinSize.z, floor.platformMaxSize.z)
-                );
-        }
-        else
-        {
-            scale = new Vector3(
-                UnityEngine.Random.Range(floor.platformMinSize.x, floor.platformMaxSize.x),
-                UnityEngine.Random.Range(floor.platformMinSize.y, floor.platformMaxSize.y),
-                UnityEngine.Random.Range(floor.platformMinSize.z, floor.platformMaxSize.z)
-                );
-        }
-
-        Vector3 position = floor.platformNextPosition;
-        position.x += scale.x * 0.5f;
-        position.y += scale.y * 0.5f;
-        //position.z += scale.z * 0.5f;
-
         PlatformScript platformScript = floor.platformQueue.Dequeue();
         if (floor.platformStartPosition == floor.platformNextPosition)
         {
             platformScript.MoveResize(12, 12,
                 floor.platformMinSize.y, floor.platformMaxSize.y,
                 floor.platformMinSize.z, floor.platformMaxSize.z,
-                position);
+                floor.platformStartPosition);
         }
         else
         {
             platformScript.MoveResize(floor.platformMinSize.x, floor.platformMaxSize.x,
             floor.platformMinSize.y, floor.platformMaxSize.y,
             floor.platformMinSize.z, floor.platformMaxSize.z,
-            position);
+            floor.platformNextPosition);
+            SpawnObjects(platformScript.GenerateSpawnObjectTypesArray(), platformScript);
         }
-        SpawnObjects(platformScript.GenerateSpawnObjectTypesArray());
         platformScript.renderer.material.color = Color.HSVToRGB(UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f));
-        floor.platformQueue.Enqueue(platformScript);
+        Vector3 position = floor.platformNextPosition;
+        position.x += platformScript.transform.localScale.x * 0.5f;
+        position.y += platformScript.transform.localScale.y * 0.5f;
+        //position.z += scale.z * 0.5f;
+
 
         if (first && player != null)
         {
             first = false;
-            player.transform.position = new Vector3(position.x, position.y + scale.y, position.z);
+            player.transform.position = new Vector3(platformScript.transform.position.x, 
+                platformScript.transform.position.y + platformScript.transform.localScale.y,
+                platformScript.transform.position.z);
         }
 
         if (floor.platformNextPosition != floor.platformStartPosition)
@@ -150,9 +163,10 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
 
         floor.platformNextPosition += new Vector3(
-            UnityEngine.Random.Range(floor.platformMinGap.x, floor.platformMaxGap.x) + scale.x,
+            UnityEngine.Random.Range(floor.platformMinGap.x, floor.platformMaxGap.x) + platformScript.transform.localScale.x,
             UnityEngine.Random.Range(floor.platformMinGap.y, floor.platformMaxGap.y),
             UnityEngine.Random.Range(floor.platformMinGap.z, floor.platformMaxGap.z));
+        floor.platformQueue.Enqueue(platformScript);
 
         if (floor.platformNextPosition.y < floor.platformMinY)
         {
@@ -164,18 +178,18 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
     }
 
-    private void SpawnObjects(SpawnedObjectType[,] spawns)
+    private void SpawnObjects(SpawnedObjectType[,] spawns, PlatformScript ps)
     {
-        for(int x = 0; x < spawns.GetLength(0); x++)
+        for (int x = 0; x < spawns.GetLength(0); x++)
         {
-            for(int y = 0; y < spawns.GetLength(1); y++)
+            for (int y = 0; y < spawns.GetLength(1); y++)
             {
                 switch (spawns[x, y])
                 {
                     case SpawnedObjectType.None:
                         break;
                     case SpawnedObjectType.Coin:
-                        SpawnCoin(x, y);
+                        SpawnCoin(ps, x, y);
                         break;
                     case SpawnedObjectType.Item:
                         break;
@@ -186,16 +200,31 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
     }
 
-    private void SpawnCoin(int x, int y)
+    private GameObject InstantiateRandomCoinObject()
+    {
+        float spawnFloat = UnityEngine.Random.Range(minSpawnObjectChance, maxSpawnObjectChance);
+        foreach (CoinSpawn cs in coinSpawns)
+        {
+            if (spawnFloat <= cs.spawnObjectChance)
+            {
+                return cs.coinObject;
+            }
+        }
+        return null;
+    }
+
+    private void SpawnCoin(PlatformScript ps, int x, int y)
     {
         //Debug.Log("Spawn coin:" + x + "-" + y);
-        //CoinScript coin = coinQueue.DequeueMax();
-        //Transform coinTransform = coin.transform;
+        CoinObject coin = tCoin.DequeueMax();
+        Transform coinTransform = coin.transform;
+        ps.SpawnObject(coin, x, y);
         //Vector3 spawnPos = new Vector3(position.x + coinTransform.localScale.x, position.y + coinTransform.localScale.y, position.z + coinTransform.localScale.z);
         //coinTransform.position = spawnPos;
-        //coin.pickedUp = false;
+        //coin.used = false;
         //coin.enabled = true;
         //coinQueue.Enqueue(coin);
+        tCoin.Enqueue(coin);
     }
 
     public void PickupCoin(float range)

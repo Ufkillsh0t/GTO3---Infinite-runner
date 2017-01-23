@@ -9,7 +9,7 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
     public SpawnedObjectType spawnedObjectType = SpawnedObjectType.None;
     public bool used = false;
 
-    protected PlayerScript player;
+    protected PlayerScript player = PlayerScript.Instance;
 
     public float Value
     {
@@ -29,12 +29,12 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
 
     protected virtual void Awake()
     {
-
+        //player = PlayerScript.Instance;
     }
 
     protected virtual void Start()
     {
-        player = PlayerScript.Instance;
+
     }
 
     protected virtual void Update()
