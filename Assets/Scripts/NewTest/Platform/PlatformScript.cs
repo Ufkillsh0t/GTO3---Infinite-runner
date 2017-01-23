@@ -85,7 +85,7 @@ public class PlatformScript : MonoBehaviour
         float spawnGapZ = (transform.localScale.z - GetGridsY()) / 2;
 
         float spawnPointX = spawnDifx + x + spawnGapX;
-        float spawnPointY = transform.localPosition.y + transform.localScale.y;
+        float spawnPointY = transform.localPosition.y + transform.localScale.y + (spawnableObject.transform.localScale.y / 2);
         float spawnPointZ = spawnDifz + y + spawnGapZ;
 
 
