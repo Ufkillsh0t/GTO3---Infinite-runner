@@ -5,6 +5,17 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
+    private enum HitDirection
+    {
+        None,
+        Top,
+        Bottom,
+        Forward,
+        Back,
+        Left,
+        Right
+    }
+
     public bool stream_mobile_debug = true;
     public bool moveAccelerometer = false;
     public bool moveSlideDistance = true;
@@ -23,7 +34,7 @@ public class PlayerScript : MonoBehaviour
 
     public float jumpSpeed = 300f;
     public float gravity = 9.81f;
-    public float deathPosY = -6f;
+    public float deathPosY = -8f;
 
     [Range(100, 500)]
     public float feetMin = 350f;
@@ -43,7 +54,7 @@ public class PlayerScript : MonoBehaviour
     private Rigidbody rigidBody;
     private BoxCollider box;
     private GestureController controller;
-    private PlatformManager pm;
+    private IPlatform pm;
 
     public PlayerSoundScript pss;
     public ParticleSystem coinParticleSystem;
@@ -82,21 +93,47 @@ public class PlayerScript : MonoBehaviour
     void Start()
     {
         Physics.gravity = new Vector3(0, -gravity, 0);
-        pm = GameObject.FindGameObjectWithTag("TerrainGenerator").GetComponent<PlatformManager>();
+        pm = GameObject.FindGameObjectWithTag("TerrainGenerator").GetComponent<IPlatform>();
     }
 
     void OnCollisionEnter(Collision col)
     {
-        if (transform.position.y > (col.transform.position.y + (col.transform.localScale.y / 2)))
+        HitDirection hitDir = ReturnHitDirection(col.transform, this.transform);
+        Debug.Log(hitDir);
+        if (hitDir == HitDirection.Top)
         {
             pss.PlayLanding();
             grounded = true;
+            zSpeed = 10f;
             if (landParticleSystem != null) landParticleSystem.Play();
         }
         else
         {
             zSpeed = 0;
         }
+    }
+
+    private HitDirection ReturnHitDirection(Transform col, Transform hit)
+    {
+        RaycastHit rayHit;
+        Vector3 direction = (col.position - hit.position).normalized;
+        Ray ray = new Ray(hit.position, direction);
+
+        if (Physics.Raycast(ray, out rayHit))
+        {
+            if (rayHit.collider != null)
+            {
+                Vector3 normal = rayHit.normal;
+                normal = rayHit.transform.TransformDirection(normal);
+                if (normal == rayHit.transform.up) return HitDirection.Top;
+                if (normal == -rayHit.transform.up) return HitDirection.Bottom;
+                if (normal == rayHit.transform.forward) return HitDirection.Forward;
+                if (normal == -rayHit.transform.forward) return HitDirection.Back;
+                if (normal == rayHit.transform.right) return HitDirection.Right;
+                if (normal == -rayHit.transform.right) return HitDirection.Left;
+            }
+        }
+        return HitDirection.None;
     }
 
     // Update is called once per frame
@@ -208,7 +245,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (pm != null)
         {
-            pm.PickupCoin(magnetPickupRange);
+            pm.Pickup(magnetPickupRange);
         }
     }
 
@@ -342,7 +379,7 @@ public class PlayerScript : MonoBehaviour
 
     private void Slide()
     {
-        Debug.Log("Slide");
+        //Debug.Log("Slide");
     }
 
     private void MoveLeft()

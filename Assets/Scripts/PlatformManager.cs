@@ -16,7 +16,7 @@ public enum CoinSpawn
     Single
 }
 
-public class PlatformManager : MonoBehaviour
+public class PlatformManager : MonoBehaviour, IPlatform
 {
     private Vector3 platformNextPosition;
     public int numberOfPlatforms = 20;
@@ -339,7 +339,7 @@ public class PlatformManager : MonoBehaviour
         coinQueue.Enqueue(coin);
     }
 
-    public void PickupCoin(float range)
+    public void Pickup(float range)
     {
         CoinScript coin = coinQueue.DequeueMin(range);
         if (coin != null)

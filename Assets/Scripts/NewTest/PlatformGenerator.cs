@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatformGenerator : MonoBehaviour
+public class PlatformGenerator : MonoBehaviour, IPlatform
 {
     [Serializable]
     public class Floor
@@ -27,12 +27,13 @@ public class PlatformGenerator : MonoBehaviour
     public int numberOfFloors = 3;
     public Floor[] platformQueues;
     private PlayerScript player;
+    private bool first = true;
 
     // Use this for initialization
     void Start()
     {
-        InstantiatePlatforms();
         player = PlayerScript.Instance;
+        InstantiatePlatforms();
     }
 
     private void InstantiatePlatforms()
@@ -69,15 +70,14 @@ public class PlatformGenerator : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        /*
+    {    
         for (int i = 0; i < platformQueues.Length; i++)
         {
             if (platformQueues[i].platformQueue.Peek().transform.localPosition.x + platformRecycleOffset < player.transform.position.x)
             {
                 Recycle(platformQueues[i]);
             }
-        }*/
+        }
     }
 
     private void Recycle(Floor floor)
@@ -110,6 +110,12 @@ public class PlatformGenerator : MonoBehaviour
         platformScript.transform.localPosition = position;
         //platformScript.transform.GetComponent<Renderer>().material.color = Color.HSVToRGB(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
         floor.platformQueue.Enqueue(platformScript);
+
+        if(first && player != null)
+        {
+            first = false;
+            player.transform.position = new Vector3(position.x, position.y + scale.y, position.z);
+        }
 
         if (floor.platformNextPosition != floor.platformStartPosition)
         {
@@ -159,5 +165,10 @@ public class PlatformGenerator : MonoBehaviour
         //Vector3 spawnPos = new Vector3(position.x + magnet.localScale.x, position.y, position.z + magnet.localScale.z);
         //magnet.position = spawnPos;
         //magnetQueue.Enqueue(magnet);
+    }
+
+    public void Pickup(float range)
+    {
+        //throw new NotImplementedException();
     }
 }
