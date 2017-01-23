@@ -57,9 +57,10 @@ public class PlatformScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        /*
         Resize(5f, 8f, 1f, 1f, 2f, 3f);
         SpawnedObjectType[,] test = GenerateSpawnObjectTypesArray();
-        Debug.Log("testeroni");
+        Debug.Log("testeroni");*/
     }
 
     // Update is called once per frame
@@ -481,8 +482,6 @@ public class PlatformScript : MonoBehaviour
                 int secYLength = (secYStart < spawns.GetLength(1)) ?
                     (((secYStart + secY) < spawns.GetLength(1)) ? secYStart + secY : spawns.GetLength(1))
                     : secYStart;
-
-                Debug.Log("LUL");
 
                 for (int x = secXStart; x < secXLength; x++)
                 {
