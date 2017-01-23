@@ -84,9 +84,9 @@ public class PickupableObject : SpawnableObject {
     /// </summary>
     /// <param name="smoothPickup"></param>
     /// <param name="visible"></param>
-    public virtual void ResetPosition(bool smoothPickup = false, bool visible = false)
+    public void ResetPosition(bool smoothPickup = false, bool visible = false)
     {
-        ResetPosition(false);
+        base.ResetPosition(false);
         this.smoothPickup = smoothPickup;
     } 
 
