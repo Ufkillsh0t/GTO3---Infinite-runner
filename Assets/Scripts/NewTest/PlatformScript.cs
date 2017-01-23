@@ -53,10 +53,12 @@ public class PlatformScript : MonoBehaviour
     public bool checkItemPlatformDistance = true;
     public SpawnType spawnType;
     public SpawnObjectTypeChance[] spawnObjectTypeChances;
+    public Renderer renderer;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
+        renderer = this.GetComponent<Renderer>();
         /*
         Resize(5f, 8f, 1f, 1f, 2f, 3f);
         SpawnedObjectType[,] test = GenerateSpawnObjectTypesArray();
@@ -67,6 +69,24 @@ public class PlatformScript : MonoBehaviour
     void Update()
     {
 
+    }
+
+    /// <summary>
+    /// Spawns a object on the rightlocation compared to this object.
+    /// </summary>
+    /// <param name="spawnableObject">The object you want to spawn on this platform.</param>
+    /// <param name="x">the x grid</param>
+    /// <param name="y">the y grid</param>
+    public void SpawnObject(SpawnableObject spawnableObject, int x, int y)
+    {
+        float spawnDifx = transform.localPosition.x + (transform.localScale.x / 2);
+        float spawnDifz = transform.localPosition.z + (transform.localScale.z / 2);
+
+        float spawnPointX = spawnDifx + x;
+        float spawnPointY = transform.localPosition.x + transform.localScale.y;
+        float spawnPointZ = spawnDifz + y;
+
+        spawnableObject.transform.position = new Vector3(spawnPointX, spawnPointY, spawnPointZ);
     }
 
     /// <summary>
@@ -1084,6 +1104,7 @@ public class PlatformScript : MonoBehaviour
         return sot;
     }
 
+    /*
     /// <summary>
     /// Returns an object based on the spawnchance you have given.
     /// The spawn chance is by default between 0 and 100.
@@ -1117,6 +1138,6 @@ public class PlatformScript : MonoBehaviour
 #endif
 
         return SpawnObject.None;
-    }
+    }*/
     #endregion
 }

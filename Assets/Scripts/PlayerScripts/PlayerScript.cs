@@ -118,6 +118,7 @@ public class PlayerScript : MonoBehaviour
         RaycastHit rayHit;
         Vector3 direction = (col.position - hit.position).normalized;
         Ray ray = new Ray(hit.position, direction);
+        HitDirection hitDir = HitDirection.None;
 
         if (Physics.Raycast(ray, out rayHit))
         {
@@ -125,15 +126,15 @@ public class PlayerScript : MonoBehaviour
             {
                 Vector3 normal = rayHit.normal;
                 normal = rayHit.transform.TransformDirection(normal);
-                if (normal == rayHit.transform.up) return HitDirection.Top;
-                if (normal == -rayHit.transform.up) return HitDirection.Bottom;
-                if (normal == rayHit.transform.forward) return HitDirection.Forward;
-                if (normal == -rayHit.transform.forward) return HitDirection.Back;
-                if (normal == rayHit.transform.right) return HitDirection.Right;
-                if (normal == -rayHit.transform.right) return HitDirection.Left;
+                if (normal == rayHit.transform.up) hitDir = HitDirection.Top;
+                if (normal == -rayHit.transform.up) hitDir = HitDirection.Bottom;
+                if (normal == rayHit.transform.forward) hitDir = HitDirection.Forward;
+                if (normal == -rayHit.transform.forward) hitDir = HitDirection.Back;
+                if (normal == rayHit.transform.right) hitDir = HitDirection.Right;
+                if (normal == -rayHit.transform.right) hitDir = HitDirection.Left;
             }
         }
-        return HitDirection.None;
+        return hitDir;
     }
 
     // Update is called once per frame

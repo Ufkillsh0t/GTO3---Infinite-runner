@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class PlatformGenerator : MonoBehaviour, IPlatform
 {
+    public const float minSpawnObjectChance = 0f;
+    public const float maxSpawnObjectChance = 100f;
+
     [Serializable]
     public class Floor
     {
@@ -19,6 +22,15 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         public Queue<PlatformScript> platformQueue;
     }
 
+    [Serializable]
+    public class CoinSpawn
+    {
+        private SpawnedObjectType spawnedObjectType = SpawnedObjectType.Coin;
+        public CoinObject coinObject;
+        [Range(minSpawnObjectChance, maxSpawnObjectChance)]
+        public float spawnObjectChance;
+    }
+
     //public Vector3 startPosition;
     public Vector3 minPlatformDifference, maxPlatformDifference;
     private Vector3 prevLayerPos;
@@ -26,6 +38,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public float platformRecycleOffset;
     public int numberOfFloors = 3;
     public Floor[] platformQueues;
+    public CoinSpawn[] coinSpawns;
     private PlayerScript player;
     private bool first = true;
 
@@ -70,7 +83,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
 
     // Update is called once per frame
     void Update()
-    {    
+    {
         for (int i = 0; i < platformQueues.Length; i++)
         {
             if (platformQueues[i].platformQueue.Peek().transform.localPosition.x + platformRecycleOffset < player.transform.position.x)
@@ -106,12 +119,25 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         //position.z += scale.z * 0.5f;
 
         PlatformScript platformScript = floor.platformQueue.Dequeue();
-        platformScript.transform.localScale = scale;
-        platformScript.transform.localPosition = position;
-        //platformScript.transform.GetComponent<Renderer>().material.color = Color.HSVToRGB(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
+        if (floor.platformStartPosition == floor.platformNextPosition)
+        {
+            platformScript.MoveResize(12, 12,
+                floor.platformMinSize.y, floor.platformMaxSize.y,
+                floor.platformMinSize.z, floor.platformMaxSize.z,
+                position);
+        }
+        else
+        {
+            platformScript.MoveResize(floor.platformMinSize.x, floor.platformMaxSize.x,
+            floor.platformMinSize.y, floor.platformMaxSize.y,
+            floor.platformMinSize.z, floor.platformMaxSize.z,
+            position);
+        }
+        SpawnObjects(platformScript.GenerateSpawnObjectTypesArray());
+        platformScript.renderer.material.color = Color.HSVToRGB(UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f));
         floor.platformQueue.Enqueue(platformScript);
 
-        if(first && player != null)
+        if (first && player != null)
         {
             first = false;
             player.transform.position = new Vector3(position.x, position.y + scale.y, position.z);
@@ -138,8 +164,31 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
     }
 
-    private void SpawnCoin(Vector3 position)
+    private void SpawnObjects(SpawnedObjectType[,] spawns)
     {
+        for(int x = 0; x < spawns.GetLength(0); x++)
+        {
+            for(int y = 0; y < spawns.GetLength(1); y++)
+            {
+                switch (spawns[x, y])
+                {
+                    case SpawnedObjectType.None:
+                        break;
+                    case SpawnedObjectType.Coin:
+                        SpawnCoin(x, y);
+                        break;
+                    case SpawnedObjectType.Item:
+                        break;
+                    case SpawnedObjectType.Obstacle:
+                        break;
+                }
+            }
+        }
+    }
+
+    private void SpawnCoin(int x, int y)
+    {
+        //Debug.Log("Spawn coin:" + x + "-" + y);
         //CoinScript coin = coinQueue.DequeueMax();
         //Transform coinTransform = coin.transform;
         //Vector3 spawnPos = new Vector3(position.x + coinTransform.localScale.x, position.y + coinTransform.localScale.y, position.z + coinTransform.localScale.z);

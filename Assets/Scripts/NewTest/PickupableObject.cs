@@ -20,14 +20,19 @@ public class PickupableObject : SpawnableObject {
     private float curRotateSpeed;
 
     // Use this for initialization
-    protected virtual void Awake () {
+    protected void Awake () {
         base.Awake();
         curPickupSpeed = startPickupSpeed;
         curRotateSpeed = startRotateSpeed;
     }
-	
-	// Update is called once per frame
-	protected virtual void Update () {
+
+    protected void Start()
+    {
+        base.Start();
+    }
+
+    // Update is called once per frame
+    protected void Update () {
         base.Update();
         if (smoothPickup)
         {

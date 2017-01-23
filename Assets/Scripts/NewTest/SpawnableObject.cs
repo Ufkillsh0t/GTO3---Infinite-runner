@@ -29,6 +29,11 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
 
     protected virtual void Awake()
     {
+
+    }
+
+    protected virtual void Start()
+    {
         player = PlayerScript.Instance;
     }
 
