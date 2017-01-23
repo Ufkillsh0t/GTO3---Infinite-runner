@@ -100,7 +100,7 @@ public class PlayerScript : MonoBehaviour
     {
         HitDirection hitDir = ReturnHitDirection(col.transform, this.transform);
         Debug.Log(hitDir);
-        if (hitDir == HitDirection.Top)
+        if (hitDir == HitDirection.Top || hitDir == HitDirection.None)
         {
             pss.PlayLanding();
             grounded = true;
@@ -109,8 +109,14 @@ public class PlayerScript : MonoBehaviour
         }
         else
         {
+            transform.position.Set(transform.position.x, transform.position.y, transform.position.z - zSpeed * Time.deltaTime);
             zSpeed = 0;
         }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        grounded = false;
     }
 
     private HitDirection ReturnHitDirection(Transform col, Transform hit)
@@ -273,7 +279,7 @@ public class PlayerScript : MonoBehaviour
                                     jumpSpeed * Time.deltaTime,
                                     -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);*/
             }
-            SetCurrentSpeed(-Input.acceleration.z); /*
+            SetCurrentSpeed(-Input.acceleration.z + 0.5f); /*
             switch (controller.currentState)
             {
                 case Gestures.TwoFingerSwipeOutwards:

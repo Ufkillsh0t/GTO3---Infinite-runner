@@ -156,12 +156,6 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
                 platformScript.transform.position.z);
         }
 
-        if (floor.platformNextPosition != floor.platformStartPosition)
-        {
-            //latestMagnet--;
-            //SpawnGridsPlatform(position, scale);
-        }
-
         floor.platformNextPosition += new Vector3(
             UnityEngine.Random.Range(floor.platformMinGap.x, floor.platformMaxGap.x) + platformScript.transform.localScale.x,
             UnityEngine.Random.Range(floor.platformMinGap.y, floor.platformMaxGap.y),
