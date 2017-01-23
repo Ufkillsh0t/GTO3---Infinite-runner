@@ -170,7 +170,7 @@ public class PlayerScript : MonoBehaviour
 
         if (transform.position.y < deathPosY)
         {
-            pss.PlayDeathSound();
+            Death();
         }
 
         if (scoreText != null) scoreText.text = collectedCoins.ToString();
@@ -423,5 +423,20 @@ public class PlayerScript : MonoBehaviour
     private void ColliderReset()
     {
         box.size = new Vector3(1, 1, 1);
+    }
+
+    public void Death()
+    {
+        pss.PlayDeathSound();
+    }
+
+    /// <summary>
+    /// Sets the currentSpeedMultiplier between the min and max speed multipliers.
+    /// </summary>
+    /// <param name="speedMultiplier">The multiplier you want.</param>
+    public void SetSpeed(float speedMultiplier)
+    {
+        currentSpeedMultiplier = speedMultiplier;
+        CheckSpeed();
     }
 }

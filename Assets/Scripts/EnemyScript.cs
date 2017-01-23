@@ -30,7 +30,7 @@ public class EnemyScript : MonoBehaviour
     {
         if (transform.localPosition.z >= -deathDistance)
         {
-            pss.PlayDeathSound();
+            player.Death();
         }
     }
 

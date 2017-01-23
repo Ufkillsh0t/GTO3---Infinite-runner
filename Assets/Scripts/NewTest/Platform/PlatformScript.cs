@@ -41,7 +41,7 @@ public class PlatformScript : MonoBehaviour
     public PlacementType placementType = PlacementType.X;
     [Range(2, 12)]
     public int itemPlatformDistance = 6;
-    private int curLastItemPlatform = 8;
+    public int curLastItemPlatform = 0;
     [Range(2, 5)]
     public int itemsGridWhenNotOne = 2;
     [Range(2, 7)]
@@ -104,12 +104,13 @@ public class PlatformScript : MonoBehaviour
     /// <param name="minZ">Minimum z scale.</param>
     /// <param name="maxZ">Maximum z scale.</param>
     /// <param name="postion">The position you want to move this platform to.</param>
-    public void MoveResize(float minX, float maxX, float minY, float maxY, float minZ, float maxZ, Vector3 postion, bool changeSpawnFunction = true)
+    public void MoveResize(float minX, float maxX, float minY, float maxY, float minZ, float maxZ, Vector3 postion, bool changeSpawnFunction = true, bool changeItemPlatformDistance = true)
     {
         Resize(minX, maxX, minY, maxY, minZ, maxZ);
         transform.position = postion;
         if(changeSpawnFunction) spawnType = (SpawnType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(SpawnType)).Length);
-        if (spawnType == SpawnType.Sectioned) Debug.Log("Has sectionerd");
+        if (changeItemPlatformDistance) curLastItemPlatform++;
+        //if (spawnType == SpawnType.Sectioned) Debug.Log("Has sectionerd");
     }
 
     /// <summary>

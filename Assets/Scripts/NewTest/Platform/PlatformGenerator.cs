@@ -23,7 +23,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     }
 
     [Serializable]
-    public class CoinSpawn
+    public class Spawn
     {
         private SpawnedObjectType spawnedObjectType = SpawnedObjectType.Coin;
         public GameObject coinObject;
@@ -39,9 +39,14 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public int numberOfFloors = 3;
     public Floor[] platformQueues;
     public int amountOfCoins = 70;
-    public CoinSpawn[] coinSpawns;
+    public Spawn[] coinSpawns;
+    public int amountOfItems = 9;
+    public Spawn[] itemSpawns;
+    public int amountOfObstacles = 18;
+    public Spawn[] obstacleSpawns;
     private PlayerScript player;
     private bool first = true;
+    private int lastSpawnedItem = 7;
 
     private TCollection<CoinObject> tCoin;
     private TCollection<ItemObject> tItem;
@@ -52,6 +57,8 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     {
         player = PlayerScript.Instance;
         InstantiateCoins();
+        InstantiateItems();
+        InstantiateObstacles();
         InstantiatePlatforms();
     }
 
@@ -94,7 +101,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
             tCoin = new TCollection<CoinObject>(amountOfCoins);
             for (int i = 0; i < amountOfCoins; i++)
             {
-                GameObject co = InstantiateRandomCoinObject();
+                GameObject co = InstantiateRandomSpawnObject(coinSpawns);
                 if (co != null)
                 {
                     tCoin.Enqueue(Instantiate(co).GetComponent<CoinObject>());
@@ -108,6 +115,54 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         else
         {
             Debug.LogError("Atleast one coin object is needed!");
+        }
+    }
+
+    private void InstantiateItems()
+    {
+        if (itemSpawns.Length > 0)
+        {
+            tItem = new TCollection<ItemObject>(amountOfItems);
+            for (int i = 0; i < amountOfItems; i++)
+            {
+                GameObject co = InstantiateRandomSpawnObject(itemSpawns);
+                if (co != null)
+                {
+                    tItem.Enqueue(Instantiate(co).GetComponent<ItemObject>());
+                }
+                else
+                {
+                    Debug.LogError("ItemObject is null!");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Atleast one item object is needed!");
+        }
+    }
+
+    private void InstantiateObstacles()
+    {
+        if (obstacleSpawns.Length > 0)
+        {
+            tObstacle = new TCollection<ObstacleObject>(amountOfObstacles);
+            for (int i = 0; i < amountOfObstacles; i++)
+            {
+                GameObject co = InstantiateRandomSpawnObject(obstacleSpawns);
+                if (co != null)
+                {
+                    tObstacle.Enqueue(Instantiate(co).GetComponent<ObstacleObject>());
+                }
+                else
+                {
+                    Debug.LogError("ItemObject is null!");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Atleast one item object is needed!");
         }
     }
 
@@ -147,11 +202,13 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         position.y += platformScript.transform.localScale.y * 0.5f;
         //position.z += scale.z * 0.5f;
 
+        platformScript.curLastItemPlatform = lastSpawnedItem;
+        lastSpawnedItem++;
 
         if (first && player != null)
         {
             first = false;
-            player.transform.position = new Vector3(platformScript.transform.position.x, 
+            player.transform.position = new Vector3(platformScript.transform.position.x,
                 platformScript.transform.position.y + platformScript.transform.localScale.y,
                 platformScript.transform.position.z);
         }
@@ -162,6 +219,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
             UnityEngine.Random.Range(floor.platformMinGap.z, floor.platformMaxGap.z));
         floor.platformQueue.Enqueue(platformScript);
 
+        //TODO: ook voor X invoeren zodat de platforms niet te ver uit elkaar kunnen gaan.
         if (floor.platformNextPosition.y < floor.platformMinY)
         {
             floor.platformNextPosition.y = floor.platformMinY + floor.platformMaxGap.y;
@@ -186,22 +244,24 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
                         SpawnCoin(ps, x, y);
                         break;
                     case SpawnedObjectType.Item:
+                        SpawnItem(ps, x, y);
                         break;
                     case SpawnedObjectType.Obstacle:
+                        SpawnObstacle(ps, x, y);
                         break;
                 }
             }
         }
     }
 
-    private GameObject InstantiateRandomCoinObject()
+    private GameObject InstantiateRandomSpawnObject(Spawn[] spawnArray)
     {
         float spawnFloat = UnityEngine.Random.Range(minSpawnObjectChance, maxSpawnObjectChance);
-        foreach (CoinSpawn cs in coinSpawns)
+        foreach (Spawn sp in spawnArray)
         {
-            if (spawnFloat <= cs.spawnObjectChance)
+            if (spawnFloat <= sp.spawnObjectChance)
             {
-                return cs.coinObject;
+                return sp.coinObject;
             }
         }
         return null;
@@ -209,16 +269,26 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
 
     private void SpawnCoin(PlatformScript ps, int x, int y)
     {
-        //Debug.Log("Spawn coin:" + x + "-" + y);
         CoinObject coin = tCoin.DequeueMax();
-        Transform coinTransform = coin.transform;
         ps.SpawnObject(coin, x, y);
-        //Vector3 spawnPos = new Vector3(position.x + coinTransform.localScale.x, position.y + coinTransform.localScale.y, position.z + coinTransform.localScale.z);
-        //coinTransform.position = spawnPos;
-        //coin.used = false;
-        //coin.enabled = true;
-        //coinQueue.Enqueue(coin);
         tCoin.Enqueue(coin);
+    }
+
+    private void SpawnItem(PlatformScript ps, int x, int y)
+    {
+        Debug.Log("Magnet spawned");
+        lastSpawnedItem = 0;
+        ItemObject item = tItem.DequeueMax();
+        ps.SpawnObject(item, x, y);
+        tItem.Enqueue(item);
+    }
+
+    private void SpawnObstacle(PlatformScript ps, int x, int y)
+    {
+        Debug.Log("Obstacle spawned!");
+        ObstacleObject obs = tObstacle.DequeueMax();
+        ps.SpawnObject(obs, x, y);
+        tObstacle.Enqueue(obs);
     }
 
     public void PickupCoin(float range)
@@ -231,16 +301,13 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
     }
 
-    private void SpawnMagnet(Vector3 position)
-    {
-        //Transform magnet = magnetQueue.Dequeue();
-        //Vector3 spawnPos = new Vector3(position.x + magnet.localScale.x, position.y, position.z + magnet.localScale.z);
-        //magnet.position = spawnPos;
-        //magnetQueue.Enqueue(magnet);
-    }
-
     public void Pickup(float range)
     {
-        //throw new NotImplementedException();
+        CoinObject coin = tCoin.DequeueMin(range);
+        if (coin != null)
+        {
+            coin.PickUp();
+            tCoin.Enqueue(coin);
+        }
     }
 }

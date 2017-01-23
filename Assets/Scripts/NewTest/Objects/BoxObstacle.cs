@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CoinObject : PickupableObject
-{
-    public int amount = 0;
-    public PickUpObject po = PickUpObject.Coin;
+public class BoxObstacle : ObstacleObject {
+
+    public float playerSpeed = 0.5f;
 
 	// Use this for initialization
 	void Start () {
@@ -21,15 +20,12 @@ public class CoinObject : PickupableObject
     {
         if (other.gameObject.layer == 8)
         {
-            PickUp();
+            SlowPlayer();
         }
     }
 
-    public override void PickUp()
+    public void SlowPlayer()
     {
-        base.PickUp();
-        player.collectedCoins += amount;
-        player.pss.PlayPickup(po);
-        if (player.coinParticleSystem != null) player.coinParticleSystem.Play();
+        base.SetPlayerSpeed(playerSpeed);
     }
 }
