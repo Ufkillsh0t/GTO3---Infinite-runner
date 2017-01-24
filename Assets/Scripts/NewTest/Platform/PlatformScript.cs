@@ -59,7 +59,7 @@ public class PlatformScript : MonoBehaviour
     // Use this for initialization
     protected void Awake()
     {
-        renderer = this.GetComponent<Renderer>();
+        renderer = GetComponent<Renderer>();
         /*
         Resize(5f, 8f, 1f, 1f, 2f, 3f);
         SpawnedObjectType[,] test = GenerateSpawnObjectTypesArray();
@@ -127,6 +127,11 @@ public class PlatformScript : MonoBehaviour
         spawnableObject.transform.position = new Vector3(spawnPointX, spawnPointY, spawnPointZ);
         spawnableObject.used = false;
         spawnableObject.Show();
+        /*
+        spawnableObject.transform.SetParent(transform); //vreemde scaling.
+        spawnableObject.transform.localScale = new Vector3(transform.localScale.x * spawnableObject.transform.localScale.x,
+            transform.localScale.y * spawnableObject.transform.localScale.y,
+            transform.localScale.z * spawnableObject.transform.localScale.z);*/
     }
 
     /// <summary>

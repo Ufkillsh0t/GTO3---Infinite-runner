@@ -26,6 +26,8 @@ public class BoxObstacle : ObstacleObject {
 
     public void SlowPlayer()
     {
-        base.SetPlayerSpeed(playerSpeed);
+        SetPlayerSpeed(playerSpeed);
+        ResetPosition(false);
+        Hide();
     }
 }

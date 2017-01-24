@@ -26,7 +26,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public class Spawn
     {
         private SpawnedObjectType spawnedObjectType = SpawnedObjectType.Coin;
-        public GameObject coinObject;
+        public GameObject gameObject;
         [Range(minSpawnObjectChance, maxSpawnObjectChance)]
         public float spawnObjectChance;
     }
@@ -38,6 +38,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     public float platformRecycleOffset;
     public int numberOfFloors = 3;
     public Floor[] platformQueues;
+    public Spawn[] platforms;
     public int amountOfCoins = 70;
     public Spawn[] coinSpawns;
     public int amountOfItems = 9;
@@ -73,7 +74,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
                     Queue<PlatformScript> platformQueue = new Queue<PlatformScript>(platformQueues[floor].numberOfPlatforms);
                     for (int i = 0; i < platformQueues[floor].numberOfPlatforms; i++)
                     {
-                        platformQueue.Enqueue(Instantiate(platformPrefab).GetComponent<PlatformScript>());
+                        platformQueue.Enqueue(Instantiate(InstantiateRandomSpawnObject(platforms)).GetComponent<PlatformScript>());
                     }
                     platformQueues[floor].platformQueue = platformQueue;
                     platformQueues[floor].platformNextPosition = platformQueues[floor].platformStartPosition;
@@ -194,7 +195,8 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
             floor.platformMinSize.y, floor.platformMaxSize.y,
             floor.platformMinSize.z, floor.platformMaxSize.z,
             floor.platformNextPosition);
-            SpawnObjects(platformScript.GenerateSpawnObjectTypesArray(), platformScript);
+            if(platformScript.movementAxis == MovementAxis.None)
+                SpawnObjects(platformScript.GenerateSpawnObjectTypesArray(), platformScript);
         }
         platformScript.renderer.material.color = Color.HSVToRGB(UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f));
         Vector3 position = floor.platformNextPosition;
@@ -261,7 +263,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         {
             if (spawnFloat <= sp.spawnObjectChance)
             {
-                return sp.coinObject;
+                return sp.gameObject;
             }
         }
         return null;
