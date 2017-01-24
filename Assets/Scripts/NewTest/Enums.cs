@@ -55,3 +55,11 @@ public enum PlacementType
     X,
     Y
 }
+
+public enum MovementAxis
+{
+    None,
+    X,
+    Y,
+    Z
+}

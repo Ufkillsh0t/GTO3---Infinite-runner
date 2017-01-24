@@ -214,7 +214,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         }
 
         floor.platformNextPosition += new Vector3(
-            UnityEngine.Random.Range(floor.platformMinGap.x, floor.platformMaxGap.x) + platformScript.transform.localScale.x,
+            UnityEngine.Random.Range(floor.platformMinGap.x, floor.platformMaxGap.x) + platformScript.transform.localScale.x + platformScript.GetMinMovement(MovementAxis.X),
             UnityEngine.Random.Range(floor.platformMinGap.y, floor.platformMaxGap.y),
             UnityEngine.Random.Range(floor.platformMinGap.z, floor.platformMaxGap.z));
         floor.platformQueue.Enqueue(platformScript);

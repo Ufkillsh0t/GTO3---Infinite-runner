@@ -53,10 +53,11 @@ public class PlatformScript : MonoBehaviour
     public bool checkItemPlatformDistance = true;
     public SpawnType spawnType;
     public SpawnObjectTypeChance[] spawnObjectTypeChances;
+    public MovementAxis movementAxis = MovementAxis.None;
     public Renderer renderer;
 
     // Use this for initialization
-    void Awake()
+    protected void Awake()
     {
         renderer = this.GetComponent<Renderer>();
         /*
@@ -66,9 +67,39 @@ public class PlatformScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
 
+    }
+
+    /// <summary>
+    /// Gets the max movement
+    /// </summary>
+    /// <param name="ma">the axis on which this object moves.</param>
+    /// <returns>the max axis coord of the movement.</returns>
+    public virtual float GetMaxMovement(MovementAxis ma)
+    {
+        return 0;
+    }
+
+    /// <summary>
+    /// Gets the min movement.
+    /// </summary>
+    /// <param name="ma">the axis on which this object moves.</param>
+    /// <returns>the min axis coord of the movement.</returns>
+    public virtual float GetMinMovement(MovementAxis ma)
+    {
+        return 0;
+    }
+
+    /// <summary>
+    /// Gets the movement distance.
+    /// </summary>
+    /// <param name="ma">the axis on which this object moves.</param>
+    /// <returns>the movement distance of this object.</returns>
+    public virtual float GetMovingDistance(MovementAxis ma)
+    {
+        return 0;
     }
 
     /// <summary>
@@ -85,7 +116,7 @@ public class PlatformScript : MonoBehaviour
         float spawnGapZ = (transform.localScale.z - GetGridsY()) / 2;
 
         float spawnPointX = spawnDifx + x + spawnGapX;
-        float spawnPointY = transform.localPosition.y + transform.localScale.y + (spawnableObject.transform.localScale.y / 2);
+        float spawnPointY = transform.localPosition.y + transform.localScale.y;
         float spawnPointZ = spawnDifz + y + spawnGapZ;
 
 
