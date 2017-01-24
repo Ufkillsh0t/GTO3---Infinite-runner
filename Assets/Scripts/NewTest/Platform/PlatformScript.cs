@@ -24,6 +24,7 @@ public class PlatformScript : MonoBehaviour
         public SpawnChance[] spawnChances;
     }
 
+    private int floor = 0;
     public SpawnableObject[,] platformObjects;
     public Vector2 gridSize = Vector2.one;
     public Vector2 sectionSize = new Vector2(2, 1);
@@ -70,6 +71,11 @@ public class PlatformScript : MonoBehaviour
     protected void Update()
     {
 
+    }
+
+    public void SetFloor(int floor)
+    {
+        this.floor = floor;
     }
 
     /// <summary>
@@ -132,6 +138,18 @@ public class PlatformScript : MonoBehaviour
         spawnableObject.transform.localScale = new Vector3(transform.localScale.x * spawnableObject.transform.localScale.x,
             transform.localScale.y * spawnableObject.transform.localScale.y,
             transform.localScale.z * spawnableObject.transform.localScale.z);*/
+    }
+
+    /// <summary>
+    /// Moves the player to this platform.
+    /// </summary>
+    /// <param name="ps">The player</param>
+    public void MovePlayer(PlayerScript ps)
+    {
+        float boundYPlat = renderer.bounds.size.y / 2;
+        ps.transform.position = new Vector3(transform.position.x,
+                                    transform.position.y + boundYPlat,
+                                    transform.position.z);
     }
 
     /// <summary>

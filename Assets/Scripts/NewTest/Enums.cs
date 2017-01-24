@@ -63,3 +63,10 @@ public enum MovementAxis
     Y,
     Z
 }
+
+public enum NextFloor
+{
+    Upper,
+    Same,
+    Lower
+}

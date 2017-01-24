@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public enum Spawns
 {
@@ -139,16 +140,16 @@ public class PlatformManager : MonoBehaviour, IPlatform
         {
             scale = new Vector3(
                 12,
-                Random.Range(platformMinSize.y, platformMaxSize.y),
-                Random.Range(platformMinSize.z, platformMaxSize.z)
+                UnityEngine.Random.Range(platformMinSize.y, platformMaxSize.y),
+                UnityEngine.Random.Range(platformMinSize.z, platformMaxSize.z)
                 );
         }
         else
         {
             scale = new Vector3(
-                Random.Range(platformMinSize.x, platformMaxSize.x),
-                Random.Range(platformMinSize.y, platformMaxSize.y),
-                Random.Range(platformMinSize.z, platformMaxSize.z)
+                UnityEngine.Random.Range(platformMinSize.x, platformMaxSize.x),
+                UnityEngine.Random.Range(platformMinSize.y, platformMaxSize.y),
+                UnityEngine.Random.Range(platformMinSize.z, platformMaxSize.z)
                 );
         }
 
@@ -164,7 +165,7 @@ public class PlatformManager : MonoBehaviour, IPlatform
         Transform platform = platformQueue.Dequeue();
         platform.localScale = scale;
         platform.localPosition = position;
-        platform.GetComponent<Renderer>().material.color = Color.HSVToRGB(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f));
+        platform.GetComponent<Renderer>().material.color = Color.HSVToRGB(UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f));
         platformQueue.Enqueue(platform);
 
         if (platformNextPosition != platformStartPosition)
@@ -174,9 +175,9 @@ public class PlatformManager : MonoBehaviour, IPlatform
         }
 
         platformNextPosition += new Vector3(
-            Random.Range(platformMinGap.x, platformMaxGap.x) + scale.x,
-            Random.Range(platformMinGap.y, platformMaxGap.y),
-            Random.Range(platformMinGap.z, platformMaxGap.z));
+            UnityEngine.Random.Range(platformMinGap.x, platformMaxGap.x) + scale.x,
+            UnityEngine.Random.Range(platformMinGap.y, platformMaxGap.y),
+            UnityEngine.Random.Range(platformMinGap.z, platformMaxGap.z));
 
         if (platformNextPosition.y < platformMinY)
         {
@@ -211,14 +212,14 @@ public class PlatformManager : MonoBehaviour, IPlatform
         Spawns[,] gridSpawnArray = new Spawns[gridsZ, gridsX];
 
         bool magnetSpawned = (latestMagnet > 0) ? true : false;
-        int chance = Random.Range(0, totalChance);
+        int chance = UnityEngine.Random.Range(0, totalChance);
         Spawns spawn = GetSpawnByChance(chance);
 
         for (int z = 0; z < gridSpawnArray.GetLength(0); z++)
         {
             if (coinSpawnType == CoinSpawn.Line && z > 0)
             {
-                chance = Random.Range(0, totalChance);
+                chance = UnityEngine.Random.Range(0, totalChance);
                 spawn = GetSpawnByChance(chance);
             }
 
@@ -230,7 +231,7 @@ public class PlatformManager : MonoBehaviour, IPlatform
                 }
                 else if ((coinSpawnType != CoinSpawn.Line && coinSpawnType != CoinSpawn.Platform) && x > 0)
                 {
-                    chance = Random.Range(0, totalChance);
+                    chance = UnityEngine.Random.Range(0, totalChance);
                     spawn = GetSpawnByChance(chance);
                     if (spawn == Spawns.Magnet)
                     {
@@ -357,5 +358,8 @@ public class PlatformManager : MonoBehaviour, IPlatform
         magnetQueue.Enqueue(magnet);
     }
 
-
+    public PlatformScript GetNextPlatform(Vector3 position, NextFloor nf)
+    {
+        throw new NotImplementedException();
+    }
 }

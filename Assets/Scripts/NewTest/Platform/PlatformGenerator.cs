@@ -80,7 +80,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
                     platformQueues[floor].platformNextPosition = platformQueues[floor].platformStartPosition;
                     for (int i = 0; i < platformQueues[floor].numberOfPlatforms; i++)
                     {
-                        Recycle(platformQueues[floor]);
+                        Recycle(platformQueues[floor], floor);
                     }
                 }
             }
@@ -170,18 +170,19 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     // Update is called once per frame
     void Update()
     {
-        for (int i = 0; i < platformQueues.Length; i++)
+        for (int i = 0; i < platformQueues.Length; i++)//welke floor het platform op dit moment is.
         {
             if (platformQueues[i].platformQueue.Peek().transform.localPosition.x + platformRecycleOffset < player.transform.position.x)
             {
-                Recycle(platformQueues[i]);
+                Recycle(platformQueues[i], i);
             }
         }
     }
 
-    private void Recycle(Floor floor)
+    private void Recycle(Floor floor, int floorIndex)
     {
         PlatformScript platformScript = floor.platformQueue.Dequeue();
+        platformScript.SetFloor(floorIndex);
         if (floor.platformStartPosition == floor.platformNextPosition)
         {
             platformScript.MoveResize(12, 12,
@@ -195,7 +196,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
             floor.platformMinSize.y, floor.platformMaxSize.y,
             floor.platformMinSize.z, floor.platformMaxSize.z,
             floor.platformNextPosition);
-            if(platformScript.movementAxis == MovementAxis.None)
+            if (platformScript.movementAxis == MovementAxis.None)
                 SpawnObjects(platformScript.GenerateSpawnObjectTypesArray(), platformScript);
         }
         platformScript.renderer.material.color = Color.HSVToRGB(UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f), UnityEngine.Random.Range(0, 1f));
@@ -303,6 +304,62 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         {
             //coin.PickUp();
             //coinQueue.Enqueue(coin);
+        }
+    }
+
+    public PlatformScript GetNextPlatform(Vector3 pos, NextFloor nf = NextFloor.Same)
+    {
+        int curFloor = GetClosestFloor(pos);
+        switch (nf)
+        {
+            case NextFloor.Lower:
+                int lowerFloor = (curFloor < (platformQueues.Length - 1)) ? ++curFloor : platformQueues.Length - 1;
+                Debug.Log(lowerFloor);
+                return GetNextPlatform(lowerFloor);
+            case NextFloor.Upper:
+                int upperFloor = (curFloor > 0) ? --curFloor : 0;
+                Debug.Log(upperFloor);
+                return GetNextPlatform(upperFloor);
+            case NextFloor.Same:
+                return GetNextPlatform(curFloor);
+        }
+        return null;
+    }
+
+    public int GetClosestFloor(Vector3 pos)
+    {
+        int floor = int.MaxValue;
+        float minDifference = float.MaxValue;
+        for (int i = 0; i < platformQueues.Length; i++)
+        {
+            float difference = Mathf.Abs(platformQueues[i].platformMinY - pos.y);
+            float difference2 = Mathf.Abs(platformQueues[i].platformMaxY - pos.y);
+
+            if (difference > difference2 && minDifference > difference2)
+            {
+                minDifference = difference2;
+                floor = i;
+            }
+            else if (minDifference > difference)
+            {
+                minDifference = difference;
+                floor = i;
+            }
+        }
+        return floor;
+    }
+
+    public PlatformScript GetNextPlatform(int floor)
+    {
+        if (floor < platformQueues.Length && floor >= 0)
+        {
+            PlatformScript[] platformScripts = platformQueues[floor].platformQueue.ToArray();
+            int nextPlatform = (platformScripts.Length >= 1) ? 1 : 0;
+            return platformScripts[nextPlatform];
+        }
+        else
+        {
+            throw new IndexOutOfRangeException();
         }
     }
 

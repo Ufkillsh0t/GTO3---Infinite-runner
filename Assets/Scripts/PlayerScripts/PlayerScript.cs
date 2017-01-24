@@ -65,6 +65,7 @@ public class PlayerScript : MonoBehaviour
 
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
+    public IPlatform GetPlatForm { get { return pm; } }
     public static PlayerScript Instance { get { return instance; } }
 
     void Awake()
