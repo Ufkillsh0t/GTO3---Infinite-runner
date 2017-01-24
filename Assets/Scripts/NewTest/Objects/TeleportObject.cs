@@ -22,5 +22,6 @@ public class TeleportObject : ItemObject
     private void OnTriggerEnter(Collider other)
     {
         player.GetPlatForm.GetNextPlatform(player.transform.position, nextFloor).MovePlayer(player);
+        if (player.GetEnemy != null) player.GetEnemy.ResetPosition();
     }
 }

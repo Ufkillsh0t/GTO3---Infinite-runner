@@ -34,6 +34,11 @@ public class EnemyScript : MonoBehaviour
         }
     }
 
+    public void ResetPosition()
+    {
+        transform.localPosition = new Vector3(0, 0, -defaultDistance);
+    }
+
     private void Move()
     {
         if (player.currentSpeedMultiplier < enemySpeedPlayer)

@@ -61,11 +61,13 @@ public class PlayerScript : MonoBehaviour
     public ParticleSystem magnetParticleSystem;
     public ParticleSystem landParticleSystem;
 
+    private EnemyScript enemy;
     private static PlayerScript instance;
 
     public BoxCollider BoxCollider { get { return box; } set { box = value; } }
     public float MagnetDuration { get { return magnetDuration; } set { magnetDuration = value; } }
     public IPlatform GetPlatForm { get { return pm; } }
+    public EnemyScript GetEnemy { get { return enemy; } }
     public static PlayerScript Instance { get { return instance; } }
 
     void Awake()
@@ -75,6 +77,7 @@ public class PlayerScript : MonoBehaviour
         rigidBody = gameObject.GetComponent<Rigidbody>();
         box = gameObject.GetComponent<BoxCollider>();
         pss = gameObject.GetComponent<PlayerSoundScript>();
+        enemy = gameObject.GetComponentInChildren<EnemyScript>();
         bool toggled = (PlayerPrefs.GetInt(PrefKeys.SlideMovement.ToString()) == 1) ? true : false;
         if (toggled)
         {
@@ -128,7 +131,7 @@ public class PlayerScript : MonoBehaviour
         Debug.DrawRay(hit.position, direction, Color.red);
         HitDirection hitDir = HitDirection.None;
 
-        int layer = 1 << 7;
+        int layer = 1 << 8;
         //Debug.Log("LayerTest" + layer);
         if (Physics.Raycast(ray, out rayHit, 20, layer))
         {
