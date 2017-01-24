@@ -270,6 +270,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     private void SpawnCoin(PlatformScript ps, int x, int y)
     {
         CoinObject coin = tCoin.DequeueMax();
+        coin.transform.parent = null;
         ps.SpawnObject(coin, x, y);
         tCoin.Enqueue(coin);
     }
@@ -279,6 +280,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
         Debug.Log("Magnet spawned");
         lastSpawnedItem = 0;
         ItemObject item = tItem.DequeueMax();
+        item.transform.parent = null;
         ps.SpawnObject(item, x, y);
         tItem.Enqueue(item);
     }
@@ -287,6 +289,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
     {
         Debug.Log("Obstacle spawned!");
         ObstacleObject obs = tObstacle.DequeueMax();
+        obs.transform.parent = null;
         ps.SpawnObject(obs, x, y);
         tObstacle.Enqueue(obs);
     }

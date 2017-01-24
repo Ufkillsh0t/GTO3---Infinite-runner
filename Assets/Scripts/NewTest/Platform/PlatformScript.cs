@@ -110,14 +110,18 @@ public class PlatformScript : MonoBehaviour
     /// <param name="y">the y grid</param>
     public void SpawnObject(SpawnableObject spawnableObject, int x, int y)
     {
-        float spawnDifx = transform.localPosition.x - (transform.localScale.x / 2) + (spawnableObject.transform.localScale.x);
-        float spawnDifz = transform.localPosition.z - (transform.localScale.z / 2) + (spawnableObject.transform.localScale.z);
+        //spawnableObject.transform.SetParent(this.transform);
+        float xPos = transform.localPosition.x - (renderer.bounds.size.x / 2);
         float spawnGapX = (transform.localScale.x - GetGridsX()) / 2;
-        float spawnGapZ = (transform.localScale.z - GetGridsY()) / 2;
+        float spawnPointX = xPos + x + spawnGapX + (gridSize.x / 2);
 
-        float spawnPointX = spawnDifx + x + spawnGapX;
-        float spawnPointY = transform.localPosition.y + transform.localScale.y;
-        float spawnPointZ = spawnDifz + y + spawnGapZ;
+        float boundYPlat = renderer.bounds.size.y / 2;
+        float boundYSpawn = spawnableObject.renderer.bounds.size.y / 2;
+        float spawnPointY = transform.localPosition.y + boundYPlat + boundYSpawn;
+
+        float zPos = transform.localPosition.z - (renderer.bounds.size.z / 2);
+        float spawnGapZ = (transform.localScale.z - GetGridsY()) / 2;
+        float spawnPointZ = zPos + y + spawnGapZ + (gridSize.y / 2);
 
 
         spawnableObject.transform.position = new Vector3(spawnPointX, spawnPointY, spawnPointZ);
@@ -139,7 +143,7 @@ public class PlatformScript : MonoBehaviour
     {
         Resize(minX, maxX, minY, maxY, minZ, maxZ);
         transform.position = postion;
-        if(changeSpawnFunction) spawnType = (SpawnType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(SpawnType)).Length);
+        if (changeSpawnFunction) spawnType = (SpawnType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(SpawnType)).Length);
         if (changeItemPlatformDistance) curLastItemPlatform++;
         //if (spawnType == SpawnType.Sectioned) Debug.Log("Has sectionerd");
     }

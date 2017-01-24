@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoxObstacle : ObstacleObject {
 
-    public float playerSpeed = 0.5f;
+    public float playerSpeed = 0.6f;
 
 	// Use this for initialization
 	void Start () {

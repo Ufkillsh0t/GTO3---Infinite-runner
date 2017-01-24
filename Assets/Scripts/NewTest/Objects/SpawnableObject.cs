@@ -8,6 +8,7 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
     public Vector3 resetPosition = Vector3.zero;
     public SpawnedObjectType spawnedObjectType = SpawnedObjectType.None;
     public bool used = false;
+    public Renderer renderer;
 
     protected PlayerScript player = PlayerScript.Instance;
 
@@ -30,6 +31,7 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
     protected virtual void Awake()
     {
         //player = PlayerScript.Instance;
+        this.renderer = GetComponent<Renderer>();
     }
 
     protected virtual void Start()

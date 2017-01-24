@@ -7,10 +7,12 @@ public class CoinObject : PickupableObject
     public int amount = 0;
     public PickUpObject po = PickUpObject.Coin;
     public bool instantPickup;
+    private Quaternion startRotation;
 
     // Use this for initialization
     void Start()
     {
+        startRotation = transform.rotation;
         base.Start();
     }
 
@@ -43,6 +45,7 @@ public class CoinObject : PickupableObject
     private void CoinPickUp()
     {
         base.PickUp();
+        transform.rotation = startRotation;
         player.collectedCoins += amount;
         player.pss.PlayPickup(po);
         if (player.coinParticleSystem != null) player.coinParticleSystem.Play();

@@ -49,7 +49,7 @@ public class PlayerScript : MonoBehaviour
     public bool magnetUsed = false;
     public float magnetPickupRange = 5f;
     private float magnetDuration = 12f;
-
+    //public LayerMask collisionLayer;
 
     private Rigidbody rigidBody;
     private BoxCollider box;
@@ -99,7 +99,7 @@ public class PlayerScript : MonoBehaviour
     void OnCollisionEnter(Collision col)
     {
         HitDirection hitDir = ReturnHitDirection(col.transform, this.transform);
-        Debug.Log(hitDir);
+        Debug.Log(hitDir + col.gameObject.layer.ToString());
         if (hitDir == HitDirection.Top || hitDir == HitDirection.None)
         {
             pss.PlayLanding();
@@ -124,20 +124,24 @@ public class PlayerScript : MonoBehaviour
         RaycastHit rayHit;
         Vector3 direction = (col.position - hit.position).normalized;
         Ray ray = new Ray(hit.position, direction);
+        Debug.DrawRay(hit.position, direction, Color.red);
         HitDirection hitDir = HitDirection.None;
 
-        if (Physics.Raycast(ray, out rayHit))
+        int layer = 1 << 7;
+        //Debug.Log("LayerTest" + layer);
+        if (Physics.Raycast(ray, out rayHit, 20, layer))
         {
             if (rayHit.collider != null)
             {
+                Debug.Log(rayHit.collider.gameObject.layer);
                 Vector3 normal = rayHit.normal;
                 normal = rayHit.transform.TransformDirection(normal);
-                if (normal == rayHit.transform.up) hitDir = HitDirection.Top;
-                if (normal == -rayHit.transform.up) hitDir = HitDirection.Bottom;
                 if (normal == rayHit.transform.forward) hitDir = HitDirection.Forward;
                 if (normal == -rayHit.transform.forward) hitDir = HitDirection.Back;
                 if (normal == rayHit.transform.right) hitDir = HitDirection.Right;
                 if (normal == -rayHit.transform.right) hitDir = HitDirection.Left;
+                if (normal == rayHit.transform.up) hitDir = HitDirection.Top;
+                if (normal == -rayHit.transform.up) hitDir = HitDirection.Bottom;
             }
         }
         return hitDir;
