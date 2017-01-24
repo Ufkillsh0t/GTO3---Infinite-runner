@@ -131,7 +131,7 @@ public class PlayerScript : MonoBehaviour
         Debug.DrawRay(hit.position, direction, Color.red);
         HitDirection hitDir = HitDirection.None;
 
-        int layer = 1 << 8;
+        int layer = 1 << 9;
         //Debug.Log("LayerTest" + layer);
         if (Physics.Raycast(ray, out rayHit, 20, layer))
         {
