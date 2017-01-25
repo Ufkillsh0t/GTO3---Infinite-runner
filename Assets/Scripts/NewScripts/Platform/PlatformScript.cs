@@ -122,7 +122,7 @@ public class PlatformScript : MonoBehaviour
         float spawnPointX = xPos + x + spawnGapX + (gridSize.x / 2);
 
         float boundYPlat = renderer.bounds.size.y / 2;
-        float boundYSpawn = spawnableObject.renderer.bounds.size.y / 2;
+        float boundYSpawn = spawnableObject.collider.bounds.size.y / 2;
         float spawnPointY = transform.localPosition.y + boundYPlat + boundYSpawn;
 
         float zPos = transform.localPosition.z - (renderer.bounds.size.z / 2);
