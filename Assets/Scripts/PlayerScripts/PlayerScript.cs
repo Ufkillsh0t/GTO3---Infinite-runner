@@ -426,6 +426,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (!death)
         {
+            //Time.timeScale = 0;
             pss.PlayDeathSound(instantPlay);
             death = true;
         }

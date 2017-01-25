@@ -197,7 +197,7 @@ public class GameController : MonoBehaviour
             SceneManager.LoadScene(0);
         }
 
-        Time.timeScale = 0;
+        if(Time.timeScale != 0) Time.timeScale = 0;
 
         PlayerPrefs.Save();
     }
