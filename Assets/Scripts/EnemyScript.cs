@@ -30,7 +30,7 @@ public class EnemyScript : MonoBehaviour
     {
         if (transform.localPosition.z >= -deathDistance)
         {
-            player.Death();
+            player.Death(true);
         }
     }
 

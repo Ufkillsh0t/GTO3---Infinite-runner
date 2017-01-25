@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DeathObject : ObstacleObject {
 
+    public bool instantDeath = true;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -16,6 +18,6 @@ public class DeathObject : ObstacleObject {
 
     private void OnTriggerEnter(Collider other)
     {
-        KillPlayer();
+        KillPlayer(instantDeath);
     }
 }

@@ -52,9 +52,12 @@ public class GameController : MonoBehaviour
 
 
     private PlayerScript player;
+    private static GameController instance;
+    public static GameController Instance { get { return instance; } }
 
     void Awake()
     {
+        instance = this;   
         Time.timeScale = 1;
     }
 

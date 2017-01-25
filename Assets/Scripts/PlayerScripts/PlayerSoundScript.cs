@@ -79,7 +79,7 @@ public class PlayerSoundScript : MonoBehaviour
             Debug.Log("Audiosource 2 missing no pickup sound!");
         }
 
-        gc = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+        gc = GameController.Instance;
 
         triggeredDeath = false;
     }
@@ -140,14 +140,20 @@ public class PlayerSoundScript : MonoBehaviour
         }
     }
 
-    public void PlayDeathSound()
+    public void PlayDeathSound(bool instantDeath)
     {
         if (playerInteraction != null && deathSounds != null && deathSounds.Length > 0)
         {
-            if (!triggeredDeath)
+            if (!triggeredDeath && !instantDeath)
             {
                 StartCoroutine(DelayedLoad());
                 triggeredDeath = true;
+            }
+            else
+            {
+                gc.Death();
+                playerInteraction.clip = deathSounds[Random.Range(0, (deathSounds.Length))];
+                playerInteraction.Play();
             }
         }
         else

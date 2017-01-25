@@ -31,6 +31,7 @@ public class PlayerScript : MonoBehaviour
     public float maxSpeed = 2f;
 
     public bool grounded = false;
+    private bool death = false;
 
     public float jumpSpeed = 300f;
     public float gravity = 9.81f;
@@ -178,7 +179,7 @@ public class PlayerScript : MonoBehaviour
 
         if (transform.position.y < deathPosY)
         {
-            Death();
+            Death(false);
         }
 
         if (scoreText != null) scoreText.text = collectedCoins.ToString();
@@ -421,9 +422,13 @@ public class PlayerScript : MonoBehaviour
         box.size = new Vector3(1, 1, 1);
     }
 
-    public void Death()
+    public void Death(bool instantPlay)
     {
-        pss.PlayDeathSound();
+        if (!death)
+        {
+            pss.PlayDeathSound(instantPlay);
+            death = true;
+        }
     }
 
     /// <summary>
