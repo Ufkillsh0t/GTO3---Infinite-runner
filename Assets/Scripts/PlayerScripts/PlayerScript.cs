@@ -280,23 +280,11 @@ public class PlayerScript : MonoBehaviour
     {
         if (controller != null)
         {
-            if (controller.currentGesture == Gestures.Touch)
+            if (controller.currentState == Gestures.Touch)
             {
                 Jump();
-                /*transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime,
-                                    jumpSpeed * Time.deltaTime,
-                                    -Input.acceleration.z * zSpeed * mobileSpeedMultiplier * Time.deltaTime);*/
             }
-            SetCurrentSpeed(-Input.acceleration.z + 0.5f); /*
-            switch (controller.currentState)
-            {
-                case Gestures.TwoFingerSwipeOutwards:
-                    SetCurrentSpeed(-Input.acceleration.z);
-                    break;
-                case Gestures.TwoFingerTouch:
-                    SetCurrentSpeed(-Input.acceleration.z);
-                    break;
-            }*/
+            SetCurrentSpeed(-Input.acceleration.z + 0.5f);
             Move();
             transform.Translate(Input.acceleration.x * xSpeed * mobileSpeedMultiplier * Time.deltaTime, 0, 0);
         }

@@ -16,8 +16,11 @@ public class GameController : MonoBehaviour
     //The audiomixer which controls all the audio.
     public AudioMixer masterMixer;
 
+    //The highscore text of the deathPanel
+    public Text highScoreDeathPanelText;
+
     //The text of the deathPanel
-    public Text deathPanelText;
+    public Text currentScoreDeathPanelText;
 
     [Range(-80, 20)]
     public float masterVolume = 100f;
@@ -181,8 +184,10 @@ public class GameController : MonoBehaviour
 
         if (deathPanel != null)
         {
-            if (deathPanelText != null) deathPanelText.text += newHighscore.ToString();
+            if (highScoreDeathPanelText != null) highScoreDeathPanelText.text += newHighscore.ToString();
+            if (currentScoreDeathPanelText != null) currentScoreDeathPanelText.text += player.collectedCoins;
             deathPanel.SetActive(true);
+            scorePanel.SetActive(false);
         }
         else
         {
