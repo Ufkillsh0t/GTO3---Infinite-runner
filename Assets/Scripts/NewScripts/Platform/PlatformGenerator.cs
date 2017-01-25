@@ -157,7 +157,7 @@ public class PlatformGenerator : MonoBehaviour, IPlatform
                 }
                 else
                 {
-                    Debug.LogError("ItemObject is null!");
+                    Debug.LogError("ObstacleObject is null!");
                 }
             }
         }

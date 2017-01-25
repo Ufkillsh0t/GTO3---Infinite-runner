@@ -32,6 +32,9 @@ public class SpawnableObject : MonoBehaviour, IComparable<SpawnableObject>, IVal
     {
         //player = PlayerScript.Instance;
         collider = GetComponent<Collider>();
+        if (collider == null) collider = GetComponentInChildren<BoxCollider>();
+
+        Debug.Log("test");
     }
 
     protected virtual void Start()
